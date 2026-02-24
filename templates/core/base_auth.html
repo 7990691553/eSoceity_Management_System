@@ -1,0 +1,37 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}eSociety{% endblock %}</title>
+
+  <!-- Google Font (optional) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'core/css/auth.css' %}">
+</head>
+<body>
+
+  <main class="auth-page">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <div class="brand-logo">eS</div>
+        <div class="brand-text">
+          <h1>eSociety</h1>
+          <p>Secure access for members & staff</p>
+        </div>
+      </div>
+
+      {% block content %}{% endblock %}
+    </div>
+
+    <footer class="auth-footer">
+      <span>© {{ now|date:"Y" }} eSociety</span>
+    </footer>
+  </main>
+
+</body>
+</html>
