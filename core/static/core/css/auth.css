@@ -149,3 +149,22 @@ body {
   opacity: 0.65;
   font-size: 12px;
 }
+
+.auth-form input,
+.auth-form select,
+.auth-form textarea {
+  width: 100%;
+  padding: 12px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.18);
+  color: #e9ecf1;
+  outline: none;
+}
+
+.auth-form input:focus,
+.auth-form select:focus,
+.auth-form textarea:focus {
+  border-color: rgba(91,124,250,0.9);
+  box-shadow: 0 0 0 3px rgba(91,124,250,0.18);
+}

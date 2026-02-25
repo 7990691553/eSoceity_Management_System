@@ -28,3 +28,18 @@ class UserSignupForm(UserCreationForm):
         if commit:
             user.save()
         return user
+
+class UserLoginForm(forms.Form):
+    email = forms.EmailField(
+        widget=forms.EmailInput(attrs={
+            "class": "input",
+            "placeholder": "Enter email"
+        })
+    )
+
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            "class": "input",
+            "placeholder": "Enter password"
+        })
+    )
