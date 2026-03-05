@@ -8,7 +8,7 @@ from .models import (
     Visitor, Delivery, Child, StaffAttendance, SocietyNotice, SocietySettings
 )
 from .forms import (
-    VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm
+    ChildAdminForm, VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm
 )
 
 
@@ -190,16 +190,23 @@ def child_list(request):
 @login_required
 @role_required("member", "chairman", "super_admin")
 def add_child(request):
-    form = ChildForm(request.POST or None, request.FILES or None)
-    if request.method == "POST" and form.is_valid():
-        obj = form.save(commit=False)
-
-        # members can only add their own child
-        if getattr(request.user, "role", None) == "member":
+    # Member: parentId auto
+    if getattr(request.user, "role", None) == "member":
+        form = ChildForm(request.POST or None, request.FILES or None)
+        if request.method == "POST" and form.is_valid():
+            obj = form.save(commit=False)
             obj.parentId = request.user
+            obj.save()
+            messages.success(request, "Child profile added.")
+            return redirect("society:child_list")
 
-        obj.save()
-        messages.success(request, "Child profile added.")
+        return render(request, "society/child_form.html", {"form": form})
+
+    # Admin/Chairman/Super Admin: must select parentId
+    form = ChildAdminForm(request.POST or None, request.FILES or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Child profile added for selected member.")
         return redirect("society:child_list")
 
     return render(request, "society/child_form.html", {"form": form})

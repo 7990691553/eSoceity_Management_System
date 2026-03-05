@@ -1,0 +1,117 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}eSociety{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="{% static 'society/css/society.css' %}">
+</head>
+<body>
+
+<div class="page">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">eS</div>
+      <div class="text">
+        <h1>eSociety</h1>
+        <p>Society management portal</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a href="{% url 'society:dashboard_redirect' %}">
+        Dashboard
+        <span class="badge">
+          {% if request.user.is_superuser %}
+            superuser
+          {% else %}
+            {{ request.user.role|default:"user" }}
+          {% endif %}
+        </span>
+      </a>
+
+      {# Admin/Chairman/Super Admin/Security menu #}
+      {% if request.user.is_superuser %}
+        <a href="{% url 'society:visitor_list' %}">Visitors</a>
+        <a href="{% url 'society:delivery_list' %}">Deliveries</a>
+        <a href="{% url 'society:staff_list' %}">Staff Attendance</a>
+      {% else %}
+        {% if request.user.role == "chairman" %}
+          <a href="{% url 'society:visitor_list' %}">Visitors</a>
+          <a href="{% url 'society:delivery_list' %}">Deliveries</a>
+          <a href="{% url 'society:staff_list' %}">Staff Attendance</a>
+        {% endif %}
+        {% if request.user.role == "super_admin" %}
+          <a href="{% url 'society:visitor_list' %}">Visitors</a>
+          <a href="{% url 'society:delivery_list' %}">Deliveries</a>
+          <a href="{% url 'society:staff_list' %}">Staff Attendance</a>
+        {% endif %}
+        {% if request.user.role == "security" %}
+          <a href="{% url 'society:visitor_list' %}">Visitors</a>
+          <a href="{% url 'society:delivery_list' %}">Deliveries</a>
+          <a href="{% url 'society:staff_list' %}">Staff Attendance</a>
+        {% endif %}
+      {% endif %}
+
+      {# Children menu (Member + Admin roles + Security) #}
+      {% if request.user.is_superuser %}
+        <a href="{% url 'society:child_list' %}">Children</a>
+      {% else %}
+        {% if request.user.role == "chairman" %}
+          <a href="{% url 'society:child_list' %}">Children</a>
+        {% endif %}
+        {% if request.user.role == "super_admin" %}
+          <a href="{% url 'society:child_list' %}">Children</a>
+        {% endif %}
+        {% if request.user.role == "member" %}
+          <a href="{% url 'society:child_list' %}">Children</a>
+        {% endif %}
+        {% if request.user.role == "security" %}
+          <a href="{% url 'society:child_list' %}">Children</a>
+        {% endif %}
+      {% endif %}
+
+      {# Notices: everyone #}
+      <a href="{% url 'society:notice_list' %}">Notices</a>
+
+      {# Logout placeholder (replace with real logout view later) #}
+      <a href="{% url 'core:login' %}">Logout (add later)</a>
+    </nav>
+
+    <p class="muted" style="padding: 12px 10px 0;">
+      Logged in as <b>{{ request.user.email }}</b>
+    </p>
+  </aside>
+
+  <main class="content">
+    <div class="topbar">
+      <div class="title">
+        <h2>{% block page_title %}Dashboard{% endblock %}</h2>
+        <p>{% block page_subtitle %}Welcome to eSociety{% endblock %}</p>
+      </div>
+
+      <div class="actions">
+        {% block top_actions %}{% endblock %}
+      </div>
+    </div>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+</body>
+</html>

@@ -67,7 +67,24 @@ class ChildForm(forms.ModelForm):
             raise forms.ValidationError("Child age must be between 0 and 18.")
         return age
 
+class ChildAdminForm(forms.ModelForm):
+    class Meta:
+        model = Child
+        fields = ["childName", "childAge", "childPhoto", "parentId"]
+        widgets = {
+            "childName": forms.TextInput(attrs={"class": "input", "placeholder": "Child name"}),
+            "childAge": forms.NumberInput(attrs={"class": "input", "placeholder": "Age"}),
+            "childPhoto": forms.ClearableFileInput(attrs={"class": "input"}),
+            "parentId": forms.Select(attrs={"class": "input"}),
+        }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # show only active members in dropdown (recommended)
+        self.fields["parentId"].queryset = self.fields["parentId"].queryset.filter(
+            is_active=True, role="member"
+        )
+        
 class StaffAttendanceForm(forms.ModelForm):
     class Meta:
         model = StaffAttendance

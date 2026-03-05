@@ -1,0 +1,35 @@
+{% extends "society/base_society.html" %}
+{% block title %}Deliveries | eSociety{% endblock %}
+{% block page_title %}Deliveries{% endblock %}
+{% block page_subtitle %}Track deliveries and collection status{% endblock %}
+
+{% block top_actions %}
+  {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
+    <a class="btn btn-primary" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="card full">
+    <h3>Delivery List</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Person</th><th>Status</th><th>Member</th><th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for d in deliveries %}
+          <tr>
+            <td>{{ d.deliveryPerson }}</td>
+            <td>{{ d.deliveryStatus }}</td>
+            <td>{{ d.memberId.full_name }}</td>
+            <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4">No delivery records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

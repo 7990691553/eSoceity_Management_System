@@ -1,0 +1,36 @@
+{% extends "society/base_society.html" %}
+{% block title %}Visitors | eSociety{% endblock %}
+{% block page_title %}Visitors{% endblock %}
+{% block page_subtitle %}View visitor requests and entries{% endblock %}
+
+{% block top_actions %}
+  {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
+    <a class="btn btn-primary" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="card full">
+    <h3>Visitor List</h3>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Name</th><th>Type</th><th>Status</th><th>Member</th><th>Created</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in visitors %}
+          <tr>
+            <td>{{ v.visitorName }}</td>
+            <td>{{ v.visitorType }}</td>
+            <td>{{ v.approvalStatus }}</td>
+            <td>{{ v.memberId.full_name }}</td>
+            <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">No visitor records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "society/base_society.html" %}
+{% block title %}Security Dashboard | eSociety{% endblock %}
+{% block page_title %}Security Dashboard{% endblock %}
+{% block page_subtitle %}Daily entries and quick actions{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-primary" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
+  <a class="btn btn-ghost" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <div class="card small">
+      <h3>Visitors Pending</h3>
+      <p class="big">{{ visitor_pending }}</p>
+      <p class="muted">Need approval</p>
+    </div>
+
+    <div class="card small">
+      <h3>Deliveries Pending</h3>
+      <p class="big">{{ deliveries_pending }}</p>
+      <p class="muted">Not collected</p>
+    </div>
+
+    <div class="card small">
+      <h3>Staff Today</h3>
+      <p class="big">{{ staff_today }}</p>
+      <p class="muted">Attendance marked</p>
+    </div>
+
+    <div class="card wide">
+      <h3>Recent Visitors</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Name</th><th>Status</th><th>Member</th></tr>
+        </thead>
+        <tbody>
+          {% for v in recent_visitors %}
+            <tr>
+              <td>{{ v.visitorName }}</td>
+              <td>{{ v.approvalStatus }}</td>
+              <td>{{ v.memberId.full_name }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No recent visitors.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card wide">
+      <h3>Recent Deliveries</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Person</th><th>Status</th><th>Member</th></tr>
+        </thead>
+        <tbody>
+          {% for d in recent_deliveries %}
+            <tr>
+              <td>{{ d.deliveryPerson }}</td>
+              <td>{{ d.deliveryStatus }}</td>
+              <td>{{ d.memberId.full_name }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No recent deliveries.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

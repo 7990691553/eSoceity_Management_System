@@ -1,0 +1,33 @@
+{% extends "society/base_society.html" %}
+{% block title %}Children | eSociety{% endblock %}
+{% block page_title %}Children{% endblock %}
+{% block page_subtitle %}Manage child profiles{% endblock %}
+
+{% block top_actions %}
+  {% if request.user.is_superuser or request.user.role in "member chairman super_admin" %}
+    <a class="btn btn-primary" href="{% url 'society:add_child' %}">+ Add Child</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="card full">
+    <h3>Child Profiles</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>Age</th><th>Parent</th><th>Created</th></tr>
+      </thead>
+      <tbody>
+        {% for c in children %}
+          <tr>
+            <td>{{ c.childName }}</td>
+            <td>{{ c.childAge }}</td>
+            <td>{{ c.parentId.full_name }}</td>
+            <td>{{ c.createdAt|date:"d M Y" }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="4">No child profiles found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends "society/base_society.html" %}
+{% block title %}Member Dashboard | eSociety{% endblock %}
+{% block page_title %}Member Dashboard{% endblock %}
+{% block page_subtitle %}Your visitors, deliveries, children and notices{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-primary" href="{% url 'society:add_child' %}">+ Add Child</a>
+{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <div class="card wide">
+      <h3>My Visitors</h3>
+      <table class="table">
+        <thead><tr><th>Name</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for v in my_visitors %}
+            <tr>
+              <td>{{ v.visitorName }}</td>
+              <td>{{ v.approvalStatus }}</td>
+              <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No visitor records.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card wide">
+      <h3>My Deliveries</h3>
+      <table class="table">
+        <thead><tr><th>Person</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody>
+          {% for d in my_deliveries %}
+            <tr>
+              <td>{{ d.deliveryPerson }}</td>
+              <td>{{ d.deliveryStatus }}</td>
+              <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No deliveries yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card full">
+      <h3>Notices</h3>
+      <table class="table">
+        <thead><tr><th>Title</th><th>Date</th><th>Posted By</th></tr></thead>
+        <tbody>
+          {% for n in notices %}
+            <tr>
+              <td>{{ n.noticeTitle }}</td>
+              <td>{{ n.postedDate|date:"d M Y" }}</td>
+              <td>{{ n.postedBy.full_name }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No notices available.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}

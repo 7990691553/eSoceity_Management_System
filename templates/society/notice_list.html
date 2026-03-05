@@ -1,0 +1,32 @@
+{% extends "society/base_society.html" %}
+{% block title %}Notices | eSociety{% endblock %}
+{% block page_title %}Notices{% endblock %}
+{% block page_subtitle %}Society announcements and updates{% endblock %}
+
+{% block top_actions %}
+  {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+    <a class="btn btn-primary" href="{% url 'society:add_notice' %}">+ Add Notice</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="card full">
+    <h3>Notice Board</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Title</th><th>Date</th><th>Posted By</th></tr>
+      </thead>
+      <tbody>
+        {% for n in notices %}
+          <tr>
+            <td>{{ n.noticeTitle }}</td>
+            <td>{{ n.postedDate|date:"d M Y" }}</td>
+            <td>{{ n.postedBy.full_name }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="3">No notices yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "society/base_society.html" %}
+{% block title %}Staff Attendance | eSociety{% endblock %}
+{% block page_title %}Staff Attendance{% endblock %}
+{% block page_subtitle %}Track daily attendance{% endblock %}
+
+{% block top_actions %}
+  {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
+    <a class="btn btn-primary" href="{% url 'society:add_staff' %}">+ Mark Attendance</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="card full">
+    <h3>Attendance Records</h3>
+    <table class="table">
+      <thead>
+        <tr><th>Name</th><th>Role</th><th>Date</th><th>In</th><th>Out</th></tr>
+      </thead>
+      <tbody>
+        {% for s in staff %}
+          <tr>
+            <td>{{ s.staffName }}</td>
+            <td>{{ s.staffRole }}</td>
+            <td>{{ s.attendanceDate|date:"d M Y" }}</td>
+            <td>{{ s.staffInTime }}</td>
+            <td>{{ s.staffOutTime }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5">No attendance records found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

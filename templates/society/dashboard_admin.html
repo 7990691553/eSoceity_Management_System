@@ -1,0 +1,94 @@
+{% extends "society/base_society.html" %}
+{% block title %}Admin Dashboard | eSociety{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block page_subtitle %}Society overview and quick stats{% endblock %}
+
+{% block content %}
+  <div class="grid">
+    <div class="card small">
+      <h3>Total Visitors</h3>
+      <p class="big">{{ visitor_count }}</p>
+      <p class="muted">All time</p>
+    </div>
+
+    <div class="card small">
+      <h3>Total Deliveries</h3>
+      <p class="big">{{ delivery_count }}</p>
+      <p class="muted">All time</p>
+    </div>
+
+    <div class="card small">
+      <h3>Children Profiles</h3>
+      <p class="big">{{ child_count }}</p>
+      <p class="muted">Registered</p>
+    </div>
+
+    <div class="card small">
+      <h3>Staff Today</h3>
+      <p class="big">{{ staff_today }}</p>
+      <p class="muted">Attendance marked</p>
+    </div>
+
+    <div class="card wide">
+      <h3>Recent Visitors</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Name</th><th>Type</th><th>Status</th><th>Created</th></tr>
+        </thead>
+        <tbody>
+          {% for v in recent_visitors %}
+            <tr>
+              <td>{{ v.visitorName }}</td>
+              <td>{{ v.visitorType }}</td>
+              <td>{{ v.approvalStatus }}</td>
+              <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4">No visitors yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card wide">
+      <h3>Recent Deliveries</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Person</th><th>Status</th><th>Member</th><th>Created</th></tr>
+        </thead>
+        <tbody>
+          {% for d in recent_deliveries %}
+            <tr>
+              <td>{{ d.deliveryPerson }}</td>
+              <td>{{ d.deliveryStatus }}</td>
+              <td>{{ d.memberId.full_name }}</td>
+              <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="4">No deliveries yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card full">
+      <h3>Latest Notices</h3>
+      <table class="table">
+        <thead>
+          <tr><th>Title</th><th>Posted By</th><th>Date</th></tr>
+        </thead>
+        <tbody>
+          {% for n in recent_notices %}
+            <tr>
+              <td>{{ n.noticeTitle }}</td>
+              <td>{{ n.postedBy.full_name }}</td>
+              <td>{{ n.postedDate|date:"d M Y" }}</td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="3">No notices yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+{% endblock %}
