@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.core.mail import send_mail
 from django.contrib import messages
 from django.urls import reverse
@@ -80,3 +80,7 @@ def userLoginView(request):
 
     form = UserLoginForm()
     return render(request, "core/login.html", {"form": form})
+
+def userLogoutView(request):
+    logout(request)
+    return redirect("core:login")

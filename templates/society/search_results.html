@@ -1,0 +1,109 @@
+{% extends "society/base_society.html" %}
+{% block title %}Search | eSociety{% endblock %}
+{% block page_title %}Search Results{% endblock %}
+{% block page_subtitle %}Showing results for "{{ q }}"{% endblock %}
+
+{% block content %}
+  {% if not q %}
+    <div class="card full">
+      <h3>Type something to search</h3>
+      <p class="muted">Try: “amazon”, “pending”, a visitor name, or a notice title.</p>
+    </div>
+  {% else %}
+    <div class="grid">
+      <div class="card full">
+        <h3>Visitors</h3>
+        <table class="table">
+          <thead><tr><th>Name</th><th>Status</th><th>Member</th><th>Created</th></tr></thead>
+          <tbody>
+            {% for v in results.visitors %}
+              <tr>
+                <td>{{ v.visitorName }}</td>
+                <td>{{ v.approvalStatus }}</td>
+                <td>{{ v.memberId.full_name }}</td>
+                <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4">No visitor matches.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card full">
+        <h3>Deliveries</h3>
+        <table class="table">
+          <thead><tr><th>Person</th><th>Status</th><th>Member</th><th>Created</th></tr></thead>
+          <tbody>
+            {% for d in results.deliveries %}
+              <tr>
+                <td>{{ d.deliveryPerson }}</td>
+                <td>{{ d.deliveryStatus }}</td>
+                <td>{{ d.memberId.full_name }}</td>
+                <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="4">No delivery matches.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card full">
+        <h3>Children</h3>
+        <table class="table">
+          <thead><tr><th>Name</th><th>Age</th><th>Parent</th></tr></thead>
+          <tbody>
+            {% for c in results.children %}
+              <tr>
+                <td>{{ c.childName }}</td>
+                <td>{{ c.childAge }}</td>
+                <td>{{ c.parentId.full_name }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No child matches.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      {% if results.staff %}
+      <div class="card full">
+        <h3>Staff Attendance</h3>
+        <table class="table">
+          <thead><tr><th>Name</th><th>Role</th><th>Date</th></tr></thead>
+          <tbody>
+            {% for s in results.staff %}
+              <tr>
+                <td>{{ s.staffName }}</td>
+                <td>{{ s.staffRole }}</td>
+                <td>{{ s.attendanceDate|date:"d M Y" }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No staff matches.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endif %}
+
+      <div class="card full">
+        <h3>Notices</h3>
+        <table class="table">
+          <thead><tr><th>Title</th><th>Date</th><th>Posted By</th></tr></thead>
+          <tbody>
+            {% for n in results.notices %}
+              <tr>
+                <td>{{ n.noticeTitle }}</td>
+                <td>{{ n.postedDate|date:"d M Y" }}</td>
+                <td>{{ n.postedBy.full_name }}</td>
+              </tr>
+            {% empty %}
+              <tr><td colspan="3">No notice matches.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

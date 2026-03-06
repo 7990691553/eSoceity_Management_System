@@ -26,4 +26,7 @@ urlpatterns = [
 
     path("notices/", views.notice_list, name="notice_list"),
     path("notices/add/", views.add_notice, name="add_notice"),
+
+    path("search/", views.search_page, name="search_page"),
+    path("search/suggest/", views.search_suggest, name="search_suggest"),
 ]
