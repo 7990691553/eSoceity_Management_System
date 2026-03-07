@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.db.models import Q
+from ai.services.copilot import generate_copilot_context
 
 from .decorators import role_required
 from .models import (
@@ -106,7 +107,6 @@ def helper_dashboard(request):
         "notices": SocietyNotice.objects.order_by("-createdAt")[:10]
     }
     return render(request, "society/dashboard_helper.html", context)
-
 
 # ---------------- VISITOR ----------------
 

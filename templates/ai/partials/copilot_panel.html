@@ -1,0 +1,42 @@
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+                <h4 class="card-title mb-1">{{ copilot.heading }}</h4>
+                <p class="text-muted mb-0">Role-based AI assistance for your dashboard.</p>
+            </div>
+            <a href="{% url 'ai:copilot' %}" class="btn btn-sm btn-dark">Open Copilot</a>
+        </div>
+
+        <p>{{ copilot.summary }}</p>
+
+        <div class="mb-3">
+            <strong>Recommended Action:</strong>
+            <div>{{ copilot.recommended_action }}</div>
+        </div>
+
+        {% if copilot.priority_tasks %}
+        <div class="mb-3">
+            <strong>Top Priorities:</strong>
+            <ul class="mb-0 mt-2">
+                {% for task in copilot.priority_tasks %}
+                    <li>{{ task }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if copilot.status_cards %}
+        <div class="row mt-3">
+            {% for card in copilot.status_cards %}
+            <div class="col-md-3 col-6 mb-3">
+                <div class="border rounded p-3 text-center h-100">
+                    <div class="small text-muted">{{ card.label }}</div>
+                    <div class="fw-bold">{{ card.value }}</div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>

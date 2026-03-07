@@ -1,0 +1,74 @@
+{% extends "society/base_society.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ copilot.heading }}</h2>
+        <a href="{% url 'society:dashboard_redirect' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+
+    <!-- Summary -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title">AI Summary</h4>
+            <p class="mb-0">{{ copilot.summary }}</p>
+        </div>
+    </div>
+
+    <!-- Recommended Action -->
+    <div class="card shadow-sm mb-4 border-0 bg-light">
+        <div class="card-body">
+            <h4 class="card-title">Recommended Next Action</h4>
+            <p class="mb-0"><strong>{{ copilot.recommended_action }}</strong></p>
+        </div>
+    </div>
+
+    <!-- Status Cards -->
+    {% if copilot.status_cards %}
+    <div class="row mb-4">
+        {% for card in copilot.status_cards %}
+        <div class="col-md-6 col-lg-3 mb-3">
+            <div class="card shadow-sm h-100">
+                <div class="card-body text-center">
+                    <h6 class="text-muted">{{ card.label }}</h6>
+                    <h3 class="mb-0">{{ card.value }}</h3>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Priority Tasks -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h4 class="card-title">Priority Tasks</h4>
+            {% if copilot.priority_tasks %}
+                <ul class="mb-0">
+                    {% for task in copilot.priority_tasks %}
+                        <li class="mb-2">{{ task }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="mb-0">No high-priority tasks right now.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <h4 class="card-title">AI Tips</h4>
+            {% if copilot.tips %}
+                <ul class="mb-0">
+                    {% for tip in copilot.tips %}
+                        <li class="mb-2">{{ tip }}</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p class="mb-0">No additional tips available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

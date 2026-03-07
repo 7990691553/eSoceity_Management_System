@@ -9,6 +9,22 @@
 
 {% block content %}
   <div class="grid">
+
+    <div class="card full">
+  <div class="card-header">
+    <h3>eSociety Copilot</h3>
+    <a class="link" href="{% url 'ai:copilot' %}">Open</a>
+  </div>
+
+  <p class="muted" style="margin-bottom: 12px;">
+    Get role-based updates, important notices, and your next recommended actions.
+  </p>
+
+  <a href="{% url 'ai:copilot' %}" class="btn btn-primary">
+    Open Copilot
+  </a>
+</div>
+
     <div class="card wide">
       <h3>My Visitors</h3>
       <table class="table">
