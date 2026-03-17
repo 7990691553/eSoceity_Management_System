@@ -1,33 +1,66 @@
 {% extends "society/base_society.html" %}
 {% block title %}Children | eSociety{% endblock %}
 {% block page_title %}Children{% endblock %}
-{% block page_subtitle %}Manage child profiles{% endblock %}
+{% block page_subtitle %}Registered children profiles and monitoring{% endblock %}
 
 {% block top_actions %}
-  {% if request.user.is_superuser or request.user.role in "member chairman super_admin" %}
-    <a class="btn btn-primary" href="{% url 'society:add_child' %}">+ Add Child</a>
-  {% endif %}
+  <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
 {% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Child Profiles</h3>
+
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
+    <div class="stat-card sc-teal">
+      <span class="stat-icon">👶</span>
+      <h3>Total Children</h3>
+      <p class="big">{{ total_count|default:"0" }}</p>
+      <p class="muted">Registered profiles</p>
+    </div>
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">🏠</span>
+      <h3>Age Limit</h3>
+      <p class="big">{{ age_limit|default:"—" }}</p>
+      <p class="muted">Max age allowed</p>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Children</h3>
+      <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
+    </div>
     <table class="table">
       <thead>
-        <tr><th>Name</th><th>Age</th><th>Parent</th><th>Created</th></tr>
+        <tr>
+          <th>Name</th>
+          <th>Age</th>
+          <th>Parent</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+          <th>Registered</th>
+        </tr>
       </thead>
       <tbody>
         {% for c in children %}
           <tr>
-            <td>{{ c.childName }}</td>
-            <td>{{ c.childAge }}</td>
-            <td>{{ c.parentId.full_name }}</td>
-            <td>{{ c.createdAt|date:"d M Y" }}</td>
+            <td style="font-weight:600;color:var(--text);">{{ c.childName }}</td>
+            <td>
+              <span class="status-badge sb-guest">{{ c.childAge }} yrs</span>
+            </td>
+            <td style="color:var(--muted);">{{ c.parentId.full_name }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ c.inTime|default:"—" }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ c.outTime|default:"—" }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ c.createdAt|date:"d M Y" }}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="4">No child profiles found.</td></tr>
+          <tr>
+            <td colspan="6" style="text-align:center;padding:28px;color:var(--muted);">
+              No children registered yet.
+            </td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
 {% endblock %}

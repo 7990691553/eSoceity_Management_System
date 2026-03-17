@@ -1,32 +1,68 @@
 {% extends "society/base_society.html" %}
 {% block title %}Notices | eSociety{% endblock %}
-{% block page_title %}Notices{% endblock %}
-{% block page_subtitle %}Society announcements and updates{% endblock %}
+{% block page_title %}Society Notices{% endblock %}
+{% block page_subtitle %}Announcements and updates for all residents{% endblock %}
 
 {% block top_actions %}
   {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
-    <a class="btn btn-primary" href="{% url 'society:add_notice' %}">+ Add Notice</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'society:add_notice' %}">+ Post Notice</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Notice Board</h3>
-    <table class="table">
-      <thead>
-        <tr><th>Title</th><th>Date</th><th>Posted By</th></tr>
-      </thead>
-      <tbody>
-        {% for n in notices %}
-          <tr>
-            <td>{{ n.noticeTitle }}</td>
-            <td>{{ n.postedDate|date:"d M Y" }}</td>
-            <td>{{ n.postedBy.full_name }}</td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="3">No notices yet.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Notices</h3>
+      {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'society:add_notice' %}">+ Post Notice</a>
+      {% endif %}
+    </div>
+
+    {% for n in notices %}
+      <div style="
+        padding:16px;
+        border-bottom:1px solid var(--border);
+        display:flex;
+        gap:14px;
+        align-items:flex-start;
+        transition:background .12s;
+      " onmouseover="this.style.background='rgba(255,255,255,0.02)'"
+         onmouseout="this.style.background='transparent'">
+
+        <!-- Color dot -->
+        <div style="
+          width:8px;height:8px;border-radius:50%;
+          background:{% cycle '#6c63ff' '#00d1b2' '#f0a500' '#f05f6e' '#2dd4a0' %};
+          flex-shrink:0;margin-top:5px;
+        "></div>
+
+        <div style="flex:1;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px;">
+            <div style="font-size:14px;font-weight:600;color:var(--text);">{{ n.noticeTitle }}</div>
+            <div style="font-size:11px;color:var(--muted);white-space:nowrap;flex-shrink:0;">
+              {{ n.postedDate|date:"d M Y" }}
+            </div>
+          </div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:8px;">
+            {{ n.noticeDescription }}
+          </div>
+          <div style="font-size:11px;color:var(--muted);">
+            Posted by <strong style="color:var(--text);">{{ n.postedBy.full_name }}</strong>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div style="padding:32px;text-align:center;color:var(--muted);">
+        <div style="font-size:24px;margin-bottom:10px;">📢</div>
+        <div style="font-size:13px;">No notices posted yet.</div>
+        {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+          <a href="{% url 'society:add_notice' %}" style="color:#a0aff8;font-size:12px;margin-top:8px;display:inline-block;">
+            Post the first notice →
+          </a>
+        {% endif %}
+      </div>
+    {% endfor %}
   </div>
+
 {% endblock %}

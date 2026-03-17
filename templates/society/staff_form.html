@@ -1,30 +1,122 @@
 {% extends "society/base_society.html" %}
-{% block title %}Mark Staff Attendance | eSociety{% endblock %}
-{% block page_title %}Mark Staff Attendance{% endblock %}
-{% block page_subtitle %}Add a new attendance entry{% endblock %}
+{% block title %}Mark Attendance | eSociety{% endblock %}
+{% block page_title %}Mark Attendance{% endblock %}
+{% block page_subtitle %}Record staff in and out times{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:staff_list' %}">← Back to Attendance</a>
+{% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Staff Attendance Form</h3>
+
+<div class="dash-grid cols-21">
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Attendance Details</h3>
+    </div>
 
     {% if form.non_field_errors %}
-      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      <div class="alert alert-error" style="margin:14px 16px 0;">
+        {{ form.non_field_errors }}
+      </div>
     {% endif %}
 
-    <form method="POST" class="form" novalidate>
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
       {% csrf_token %}
-      {% for field in form %}
-        <div>
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="field-error">{{ field.errors|striptags }}</div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.staffName.id_for_label }}">
+          Staff Name <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.staffName }}
+        {% if form.staffName.errors %}
+          <div class="field-error">{{ form.staffName.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.staffRole.id_for_label }}">
+          Role <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.staffRole }}
+        {% if form.staffRole.errors %}
+          <div class="field-error">{{ form.staffRole.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.attendanceDate.id_for_label }}">
+          Date <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.attendanceDate }}
+        {% if form.attendanceDate.errors %}
+          <div class="field-error">{{ form.attendanceDate.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="dash-grid cols-2" style="margin-bottom:0;">
+        <div class="form-field">
+          <label class="form-label" for="{{ form.staffInTime.id_for_label }}">
+            In Time <span style="color:#f05f6e;">*</span>
+          </label>
+          {{ form.staffInTime }}
+          {% if form.staffInTime.errors %}
+            <div class="field-error">{{ form.staffInTime.errors|striptags }}</div>
           {% endif %}
         </div>
-      {% endfor %}
+        <div class="form-field">
+          <label class="form-label" for="{{ form.staffOutTime.id_for_label }}">
+            Out Time <span style="color:#f05f6e;">*</span>
+          </label>
+          {{ form.staffOutTime }}
+          {% if form.staffOutTime.errors %}
+            <div class="field-error">{{ form.staffOutTime.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
 
-      <button type="submit" class="btn btn-primary">Save Attendance</button>
-      <a class="btn btn-ghost" href="{% url 'society:staff_list' %}">Cancel</a>
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Attendance</button>
+        <a class="btn btn-ghost" href="{% url 'society:staff_list' %}">Cancel</a>
+      </div>
     </form>
   </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="panel-card">
+      <div class="panel-header"><h3>Staff Roles</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge sb-service">Security</span>
+          <span style="font-size:12px;color:var(--muted);">Gate security staff</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="status-badge sb-guest">Helper</span>
+          <span style="font-size:12px;color:var(--muted);">House helpers, cleaners</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-header"><h3>Note</h3></div>
+      <div style="padding:14px;font-size:12px;color:var(--muted);line-height:1.7;">
+        Out time must always be after in time. Records are saved per date — mark each staff member separately.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+</style>
+
 {% endblock %}

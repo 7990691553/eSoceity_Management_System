@@ -1,5 +1,5 @@
 from django import forms
-from .models import Visitor, Delivery, Child, StaffAttendance, SocietyNotice
+from .models import Visitor, Delivery, Child, StaffAttendance, SocietyNotice, VisitorEntryLog, ChildEntryLog
 
 class VisitorForm(forms.ModelForm):
     class Meta:
@@ -111,7 +111,6 @@ class StaffAttendanceForm(forms.ModelForm):
             raise forms.ValidationError("Out time must be after In time.")
         return cleaned
 
-
 class NoticeForm(forms.ModelForm):
     class Meta:
         model = SocietyNotice
@@ -123,4 +122,22 @@ class NoticeForm(forms.ModelForm):
         widgets = {
             "noticeTitle": forms.TextInput(attrs={"class": "input", "placeholder": "Notice title"}),
             "noticeDescription": forms.Textarea(attrs={"class": "input", "rows": 4, "placeholder": "Write notice..."}),
+        }
+
+class VisitorEntryLogForm(forms.ModelForm):
+    class Meta:
+        model = VisitorEntryLog
+        fields = "__all__"
+        widgets = {
+            # replace these with your actual fields if needed
+            # "field_name": forms.TextInput(attrs={"class": "input"}),
+        }
+
+
+class ChildEntryLogForm(forms.ModelForm):
+    class Meta:
+        model = ChildEntryLog
+        fields = "__all__"
+        widgets = {
+            # add widgets if needed
         }

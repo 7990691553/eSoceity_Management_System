@@ -1,30 +1,109 @@
 {% extends "society/base_society.html" %}
 {% block title %}Add Child | eSociety{% endblock %}
 {% block page_title %}Add Child{% endblock %}
-{% block page_subtitle %}Create a child profile{% endblock %}
+{% block page_subtitle %}Register a new child profile{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:child_list' %}">← Back to Children</a>
+{% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Child Form</h3>
+
+<div class="dash-grid cols-21">
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Child Details</h3>
+    </div>
 
     {% if form.non_field_errors %}
-      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      <div class="alert alert-error" style="margin:14px 16px 0;">
+        {{ form.non_field_errors }}
+      </div>
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data" class="form" novalidate>
+    <form method="POST" enctype="multipart/form-data" novalidate
+          style="padding:16px;display:flex;flex-direction:column;gap:16px;">
       {% csrf_token %}
-      {% for field in form %}
-        <div>
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="field-error">{{ field.errors|striptags }}</div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.childName.id_for_label }}">
+          Child Name <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.childName }}
+        {% if form.childName.errors %}
+          <div class="field-error">{{ form.childName.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.childAge.id_for_label }}">
+          Age <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.childAge }}
+        {% if form.childAge.errors %}
+          <div class="field-error">{{ form.childAge.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      {% if form.parentId %}
+        <div class="form-field">
+          <label class="form-label" for="{{ form.parentId.id_for_label }}">
+            Parent <span style="color:#f05f6e;">*</span>
+          </label>
+          {{ form.parentId }}
+          {% if form.parentId.errors %}
+            <div class="field-error">{{ form.parentId.errors|striptags }}</div>
           {% endif %}
         </div>
-      {% endfor %}
+      {% endif %}
 
-      <button type="submit" class="btn btn-primary">Save Child</button>
-      <a class="btn btn-ghost" href="{% url 'society:child_list' %}">Cancel</a>
+      <div class="form-field">
+        <label class="form-label" for="{{ form.childPhoto.id_for_label }}">
+          Photo (optional)
+        </label>
+        {{ form.childPhoto }}
+        {% if form.childPhoto.errors %}
+          <div class="field-error">{{ form.childPhoto.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Child</button>
+        <a class="btn btn-ghost" href="{% url 'society:child_list' %}">Cancel</a>
+      </div>
     </form>
   </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="panel-card">
+      <div class="panel-header"><h3>Age Policy</h3></div>
+      <div style="padding:14px;font-size:12px;color:var(--muted);line-height:1.7;">
+        Only children within the society's registered age limit are tracked for entry/exit monitoring.
+        Children above the limit are still registered but not monitored at the gate.
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-header"><h3>Photo</h3></div>
+      <div style="padding:14px;font-size:12px;color:var(--muted);line-height:1.7;">
+        Uploading a photo helps security identify the child at the gate quickly.
+        Accepted formats: JPG, PNG. Max size: 2MB.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+</style>
+
 {% endblock %}

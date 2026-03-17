@@ -1,35 +1,92 @@
 {% extends "society/base_society.html" %}
 {% block title %}Deliveries | eSociety{% endblock %}
 {% block page_title %}Deliveries{% endblock %}
-{% block page_subtitle %}Track deliveries and collection status{% endblock %}
+{% block page_subtitle %}Track all incoming deliveries{% endblock %}
 
 {% block top_actions %}
   {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
-    <a class="btn btn-primary" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Delivery List</h3>
+
+  <div class="dash-grid cols-3" style="margin-bottom:14px;">
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">📦</span>
+      <h3>Pending</h3>
+      <p class="big">{{ pending_count|default:"0" }}</p>
+      <p class="muted">Not yet collected</p>
+    </div>
+    <div class="stat-card sc-green">
+      <span class="stat-icon">✓</span>
+      <h3>Collected</h3>
+      <p class="big">{{ collected_count|default:"0" }}</p>
+      <p class="muted">Picked up</p>
+    </div>
+    <div class="stat-card sc-purple">
+      <span class="stat-icon">🏠</span>
+      <h3>At Security</h3>
+      <p class="big">{{ stored_count|default:"0" }}</p>
+      <p class="muted">Stored at gate</p>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Deliveries</h3>
+      {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
+      {% endif %}
+    </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Person</th><th>Status</th><th>Member</th><th>Created</th>
+          <th>Delivery Person</th>
+          <th>Status</th>
+          <th>Member</th>
+          <th>Delivery Allowed</th>
+          <th>Stored at Security</th>
+          <th>Created</th>
         </tr>
       </thead>
       <tbody>
         {% for d in deliveries %}
           <tr>
-            <td>{{ d.deliveryPerson }}</td>
-            <td>{{ d.deliveryStatus }}</td>
-            <td>{{ d.memberId.full_name }}</td>
-            <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+            <td style="font-weight:600;color:var(--text);">{{ d.deliveryPerson }}</td>
+            <td>
+              {% if d.deliveryStatus == "COLLECTED" %}
+                <span class="status-badge sb-approved">Collected</span>
+              {% else %}
+                <span class="status-badge sb-pending">Pending</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);">{{ d.memberId.full_name }}</td>
+            <td>
+              {% if d.deliveryAllowed %}
+                <span class="status-badge sb-approved">Yes</span>
+              {% else %}
+                <span class="status-badge sb-rejected">No</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if d.storedAtSecurity %}
+                <span class="status-badge sb-guest">Yes</span>
+              {% else %}
+                <span style="color:var(--muted);font-size:12px;">—</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);font-size:12px;">{{ d.createdAt|date:"d M Y, h:i A" }}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="4">No delivery records found.</td></tr>
+          <tr>
+            <td colspan="6" style="text-align:center;padding:28px;color:var(--muted);">
+              No delivery records found.
+            </td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
 {% endblock %}

@@ -4,47 +4,43 @@
 {% block page_subtitle %}Daily entries and quick actions{% endblock %}
 
 {% block top_actions %}
-  <a class="btn btn-primary" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
-  <a class="btn btn-ghost" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
+  <a class="btn btn-primary btn-sm" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:add_delivery' %}">+ Add Delivery</a>
 {% endblock %}
 
 {% block content %}
-  <div class="grid">
-    <div class="card small">
+
+  <!-- Stat cards row -->
+  <div class="dash-grid cols-3" style="margin-bottom:14px;">
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">⏳</span>
       <h3>Visitors Pending</h3>
       <p class="big">{{ visitor_pending }}</p>
       <p class="muted">Need approval</p>
     </div>
-
-    <div class="card small">
+    <div class="stat-card sc-red">
+      <span class="stat-icon">📦</span>
       <h3>Deliveries Pending</h3>
       <p class="big">{{ deliveries_pending }}</p>
       <p class="muted">Not collected</p>
     </div>
-
-    <div class="card small">
+    <div class="stat-card sc-green">
+      <span class="stat-icon">🪪</span>
       <h3>Staff Today</h3>
       <p class="big">{{ staff_today }}</p>
       <p class="muted">Attendance marked</p>
     </div>
-
-    <div class="card full">
-  <div class="card-header">
-    <h3>eSociety Copilot</h3>
-    <a class="link" href="{% url 'ai:copilot' %}">Open</a>
   </div>
 
-  <p class="muted" style="margin-bottom: 12px;">
-    View pending actions, priority checks, and role-based AI guidance for security operations.
-  </p>
+  <!-- Tables + quick actions -->
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
 
-  <a href="{% url 'ai:copilot' %}" class="btn btn-primary">
-    Open Copilot
-  </a>
-</div>
-
-    <div class="card wide">
-      <h3>Recent Visitors</h3>
+    <!-- Recent visitors table -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Visitors</h3>
+        <a class="link" href="{% url 'society:visitor_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead>
           <tr><th>Name</th><th>Status</th><th>Member</th></tr>
@@ -52,19 +48,31 @@
         <tbody>
           {% for v in recent_visitors %}
             <tr>
-              <td>{{ v.visitorName }}</td>
-              <td>{{ v.approvalStatus }}</td>
+              <td><b>{{ v.visitorName }}</b></td>
+              <td>
+                {% if v.approvalStatus == "APPROVED" %}
+                  <span class="status-badge sb-approved">Approved</span>
+                {% elif v.approvalStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ v.approvalStatus }}</span>
+                {% endif %}
+              </td>
               <td>{{ v.memberId.full_name }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3">No recent visitors.</td></tr>
+            <tr><td colspan="3" class="muted">No recent visitors.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <div class="card wide">
-      <h3>Recent Deliveries</h3>
+    <!-- Recent deliveries table -->
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Deliveries</h3>
+        <a class="link" href="{% url 'society:delivery_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead>
           <tr><th>Person</th><th>Status</th><th>Member</th></tr>
@@ -72,15 +80,63 @@
         <tbody>
           {% for d in recent_deliveries %}
             <tr>
-              <td>{{ d.deliveryPerson }}</td>
-              <td>{{ d.deliveryStatus }}</td>
+              <td><b>{{ d.deliveryPerson }}</b></td>
+              <td>
+                {% if d.deliveryStatus == "COLLECTED" %}
+                  <span class="status-badge sb-collected">Collected</span>
+                {% elif d.deliveryStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ d.deliveryStatus }}</span>
+                {% endif %}
+              </td>
               <td>{{ d.memberId.full_name }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3">No recent deliveries.</td></tr>
+            <tr><td colspan="3" class="muted">No recent deliveries.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- Log actions + Copilot — compact inline rows -->
+  <div class="dash-grid cols-2">
+    <div class="panel-card">
+      <div class="panel-header"><h3>Gate Logs</h3></div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">Visitor Logs</div>
+          <div class="action-desc">Add and update visitor entry logs</div>
+        </div>
+        <a href="{% url 'society:add_visitor_log' %}" class="btn-action">Add Log →</a>
+      </div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">Child Logs</div>
+          <div class="action-desc">Add and update child movement logs</div>
+        </div>
+        <a href="{% url 'society:add_child_log' %}" class="btn-action">Add Log →</a>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>AI Tools</h3></div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">eSociety Copilot</div>
+          <div class="action-desc">Priority checks &amp; gate guidance</div>
+        </div>
+        <a href="{% url 'ai:copilot' %}" class="btn-action">Open →</a>
+      </div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">AI Insights</div>
+          <div class="action-desc">Society analytics &amp; risk alerts</div>
+        </div>
+        <a href="{% url 'ai:dashboard' %}" class="btn-action">View →</a>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

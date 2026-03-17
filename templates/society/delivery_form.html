@@ -1,30 +1,106 @@
 {% extends "society/base_society.html" %}
 {% block title %}Add Delivery | eSociety{% endblock %}
 {% block page_title %}Add Delivery{% endblock %}
-{% block page_subtitle %}Record a new delivery{% endblock %}
+{% block page_subtitle %}Log a new incoming delivery{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:delivery_list' %}">← Back to Deliveries</a>
+{% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Delivery Form</h3>
+
+<div class="dash-grid cols-21">
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Delivery Details</h3>
+    </div>
 
     {% if form.non_field_errors %}
-      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      <div class="alert alert-error" style="margin:14px 16px 0;">
+        {{ form.non_field_errors }}
+      </div>
     {% endif %}
 
-    <form method="POST" class="form" novalidate>
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
       {% csrf_token %}
-      {% for field in form %}
-        <div>
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="field-error">{{ field.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      {% endfor %}
 
-      <button type="submit" class="btn btn-primary">Save Delivery</button>
-      <a class="btn btn-ghost" href="{% url 'society:delivery_list' %}">Cancel</a>
+      <div class="form-field">
+        <label class="form-label" for="{{ form.deliveryPerson.id_for_label }}">
+          Delivery Person <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.deliveryPerson }}
+        {% if form.deliveryPerson.errors %}
+          <div class="field-error">{{ form.deliveryPerson.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.memberId.id_for_label }}">
+          Receiving Member <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.memberId }}
+        {% if form.memberId.errors %}
+          <div class="field-error">{{ form.memberId.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field-check">
+        <label class="check-label">
+          {{ form.deliveryAllowed }}
+          <span>Delivery allowed into society</span>
+        </label>
+        {% if form.deliveryAllowed.errors %}
+          <div class="field-error">{{ form.deliveryAllowed.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Delivery</button>
+        <a class="btn btn-ghost" href="{% url 'society:delivery_list' %}">Cancel</a>
+      </div>
     </form>
   </div>
+
+  <!-- Help panel -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+    <div class="panel-card">
+      <div class="panel-header"><h3>Status Flow</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-pending">Pending</span>
+          <span style="color:var(--muted);">→ Waiting to be collected</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-approved">Collected</span>
+          <span style="color:var(--muted);">→ Member has picked up</span>
+        </div>
+      </div>
+    </div>
+    <div class="panel-card">
+      <div class="panel-header"><h3>Note</h3></div>
+      <div style="padding:14px;font-size:12px;color:var(--muted);line-height:1.7;">
+        If the member is unavailable, the delivery can be stored at the security gate.
+        Mark the status as <strong style="color:var(--text);">Pending</strong> until collected.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+.form-field-check { display:flex; flex-direction:column; gap:4px; }
+.check-label { display:flex; align-items:center; gap:10px; font-size:13px; color:var(--text); cursor:pointer; }
+.check-label input[type="checkbox"] { width:16px; height:16px; border-radius:4px; accent-color:#5b7cfa; cursor:pointer; flex-shrink:0; }
+</style>
+
 {% endblock %}

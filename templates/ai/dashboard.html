@@ -1,162 +1,178 @@
 {% extends "society/base_society.html" %}
+{% block title %}AI Dashboard | eSociety{% endblock %}
+{% block page_title %}AI Dashboard{% endblock %}
+{% block page_subtitle %}Intelligent analytics and society insights{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <h2 class="mb-4">AI Dashboard</h2>
+
+  <!-- Health Score + Trend Insight -->
+  <div class="dash-grid cols-21" style="margin-bottom:14px;">
 
     <!-- Society Health Score -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">Society Health Score</h4>
-                <span class="badge
-                    {% if health.status == 'Excellent' %}
-                        bg-success
-                    {% elif health.status == 'Good' %}
-                        bg-primary
-                    {% elif health.status == 'Needs Attention' %}
-                        bg-warning text-dark
-                    {% else %}
-                        bg-danger
-                    {% endif %}
-                ">
-                    {{ health.status }}
-                </span>
-            </div>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Society Health Score</h3>
+        {% if health.status == "Excellent" %}
+          <span class="status-badge sb-approved">{{ health.status }}</span>
+        {% elif health.status == "Good" %}
+          <span class="status-badge sb-guest">{{ health.status }}</span>
+        {% elif health.status == "Needs Attention" %}
+          <span class="status-badge sb-pending">{{ health.status }}</span>
+        {% else %}
+          <span class="status-badge sb-rejected">{{ health.status }}</span>
+        {% endif %}
+      </div>
 
-            <h1 class="display-6 mb-3">{{ health.score }}/100</h1>
-            <p class="mb-4"><strong>AI Recommendation:</strong> {{ health.recommendation }}</p>
-
-            <div class="row">
-                {% for item in health.breakdown %}
-                    <div class="col-md-6 col-lg-4 mb-3">
-                        <div class="card border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ item.title }}</h5>
-                                <p class="mb-2"><strong>Score:</strong> {{ item.score }}/20</p>
-                                <p class="mb-0 text-muted">{{ item.message }}</p>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
+      <!-- Score + recommendation -->
+      <div style="padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:20px;">
+        <div class="health-ring" style="flex-shrink:0;">
+          <svg width="84" height="84" viewBox="0 0 84 84">
+            <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+            <circle cx="42" cy="42" r="34" fill="none" stroke="#00d1b2" stroke-width="7"
+              stroke-dasharray="213.6"
+              stroke-dashoffset="{{ health.score|default:0 }}"
+              stroke-linecap="round"/>
+          </svg>
+          <div class="health-num">{{ health.score }}</div>
         </div>
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;opacity:.5;margin-bottom:6px;">AI Recommendation</div>
+          <div style="font-size:13px;line-height:1.6;color:var(--text);">{{ health.recommendation }}</div>
+        </div>
+      </div>
+
+      <!-- Breakdown -->
+      <div class="dash-grid cols-3" style="padding:14px;gap:10px;margin-bottom:0;">
+        {% for item in health.breakdown %}
+          <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px;">
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px;">{{ item.title }}</div>
+            <div style="font-size:22px;font-weight:700;color:#00d1b2;margin-bottom:4px;">{{ item.score }}<span style="font-size:12px;opacity:.5;">/20</span></div>
+            <div style="font-size:11px;color:var(--muted);line-height:1.5;">{{ item.message }}</div>
+          </div>
+        {% empty %}
+          <div style="grid-column:span 3;padding:14px;color:var(--muted);font-size:13px;">No breakdown available.</div>
+        {% endfor %}
+      </div>
     </div>
 
     <!-- Trend Insight -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="card-title">Trend-Based AI Insight</h4>
-            <p><strong>Generated At:</strong> {{ insight.generated_at }}</p>
-            <p><strong>Visitors Today:</strong> {{ insight.visitors_today }}</p>
-            <p><strong>Deliveries Today:</strong> {{ insight.deliveries_today }}</p>
-            <p><strong>Insight Message:</strong> {{ insight.insight_message }}</p>
+    <div class="panel-card" style="display:flex;flex-direction:column;">
+      <div class="panel-header">
+        <h3>Trend Insight</h3>
+      </div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;flex:1;">
+        <div class="stat-card sc-purple" style="grid-column:unset;">
+          <span class="stat-icon">👥</span>
+          <h3>Visitors Today</h3>
+          <p class="big">{{ insight.visitors_today }}</p>
         </div>
+        <div class="stat-card sc-teal" style="grid-column:unset;">
+          <span class="stat-icon">📦</span>
+          <h3>Deliveries Today</h3>
+          <p class="big">{{ insight.deliveries_today }}</p>
+        </div>
+        <div style="background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:12px;">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:.8px;opacity:.5;margin-bottom:6px;">AI Insight</div>
+          <div style="font-size:12px;color:var(--text);line-height:1.6;">{{ insight.insight_message }}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:8px;">{{ insight.generated_at }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Smart Alerts -->
+  <div class="panel-card" style="margin-bottom:14px;">
+    <div class="panel-header">
+      <h3>Smart Alert Engine</h3>
+      <span class="status-badge sb-service">{{ alert_count }} Alert{{ alert_count|pluralize }}</span>
     </div>
 
-    <!-- Smart Alerts -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">Smart Alert Engine</h4>
-                <span class="badge bg-dark">{{ alert_count }} Alert{{ alert_count|pluralize }}</span>
+    {% if alerts %}
+      <div class="dash-grid cols-2" style="padding:14px;gap:10px;margin-bottom:0;">
+        {% for alert in alerts %}
+          <div style="
+            border-radius:10px;
+            padding:14px;
+            border:1px solid {% if alert.severity == 'danger' %}rgba(240,95,110,0.3){% elif alert.severity == 'warning' %}rgba(240,165,0,0.3){% else %}rgba(0,209,178,0.3){% endif %};
+            background:{% if alert.severity == 'danger' %}rgba(240,95,110,0.08){% elif alert.severity == 'warning' %}rgba(240,165,0,0.08){% else %}rgba(0,209,178,0.08){% endif %};
+          ">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);">{{ alert.title }}</div>
+              {% if alert.severity == "danger" %}
+                <span class="status-badge sb-rejected" style="flex-shrink:0;">High</span>
+              {% elif alert.severity == "warning" %}
+                <span class="status-badge sb-pending" style="flex-shrink:0;">Medium</span>
+              {% else %}
+                <span class="status-badge sb-guest" style="flex-shrink:0;">Info</span>
+              {% endif %}
             </div>
-
-            {% if alerts %}
-                <div class="row">
-                    {% for alert in alerts %}
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-0 shadow-sm h-100
-                                {% if alert.severity == 'danger' %}
-                                    bg-danger-subtle
-                                {% elif alert.severity == 'warning' %}
-                                    bg-warning-subtle
-                                {% else %}
-                                    bg-info-subtle
-                                {% endif %}
-                            ">
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ alert.title }}</h5>
-                                    <p class="mb-2">{{ alert.message }}</p>
-
-                                    {% if alert.action %}
-                                        <p class="mb-1"><strong>Suggested Action:</strong> {{ alert.action }}</p>
-                                    {% endif %}
-
-                                    {% if alert.module %}
-                                        <small class="text-muted">Module: {{ alert.module|title }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-success mb-0">
-                    No important alerts detected right now. Society activity appears stable.
-                </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;">{{ alert.message }}</div>
+            {% if alert.action %}
+              <div style="font-size:11px;color:var(--text);padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:2px solid rgba(255,255,255,0.2);">
+                ↳ {{ alert.action }}
+              </div>
             {% endif %}
-        </div>
+            {% if alert.module %}
+              <div style="font-size:10px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.6px;">{{ alert.module|title }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding:20px 16px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:8px;">✓</div>
+        <div style="font-size:13px;color:var(--muted);">No important alerts detected. Society activity appears stable.</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Risk Watchlist -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>AI Risk Watchlist</h3>
+      <span class="status-badge sb-pending">{{ watchlist_count }} Item{{ watchlist_count|pluralize }}</span>
     </div>
 
-    <!-- Risk Analysis Watchlist -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="card-title mb-0">AI Risk Analysis Watchlist</h4>
-                <span class="badge bg-dark">{{ watchlist_count }} Item{{ watchlist_count|pluralize }}</span>
+    {% if watchlist %}
+      <div class="dash-grid cols-2" style="padding:14px;gap:10px;margin-bottom:0;">
+        {% for item in watchlist %}
+          <div style="
+            border-radius:10px;
+            padding:14px;
+            border:1px solid {% if item.risk_level == 'high' %}rgba(240,95,110,0.3){% elif item.risk_level == 'medium' %}rgba(240,165,0,0.3){% else %}rgba(45,212,160,0.3){% endif %};
+            background:{% if item.risk_level == 'high' %}rgba(240,95,110,0.08){% elif item.risk_level == 'medium' %}rgba(240,165,0,0.08){% else %}rgba(45,212,160,0.06){% endif %};
+          ">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:8px;">
+              <div style="font-size:13px;font-weight:600;color:var(--text);">{{ item.title }}</div>
+              {% if item.risk_level == "high" %}
+                <span class="status-badge sb-rejected" style="flex-shrink:0;">High Risk</span>
+              {% elif item.risk_level == "medium" %}
+                <span class="status-badge sb-pending" style="flex-shrink:0;">Medium Risk</span>
+              {% else %}
+                <span class="status-badge sb-approved" style="flex-shrink:0;">Low Risk</span>
+              {% endif %}
             </div>
-
-            {% if watchlist %}
-                <div class="row">
-                    {% for item in watchlist %}
-                        <div class="col-md-6 mb-3">
-                            <div class="card border-0 shadow-sm h-100
-                                {% if item.risk_level == 'high' %}
-                                    bg-danger-subtle
-                                {% elif item.risk_level == 'medium' %}
-                                    bg-warning-subtle
-                                {% else %}
-                                    bg-success-subtle
-                                {% endif %}
-                            ">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="card-title mb-0">{{ item.title }}</h5>
-                                        <span class="badge
-                                            {% if item.risk_level == 'high' %}
-                                                bg-danger
-                                            {% elif item.risk_level == 'medium' %}
-                                                bg-warning text-dark
-                                            {% else %}
-                                                bg-success
-                                            {% endif %}
-                                        ">
-                                            {{ item.risk_level|title }} Risk
-                                        </span>
-                                    </div>
-
-                                    <p class="mb-2">{{ item.message }}</p>
-                                    <p class="mb-2"><strong>Risk Score:</strong> {{ item.score }}</p>
-
-                                    {% if item.suggestion %}
-                                        <p class="mb-1"><strong>AI Suggestion:</strong> {{ item.suggestion }}</p>
-                                    {% endif %}
-
-                                    {% if item.module %}
-                                        <small class="text-muted">Module: {{ item.module|title }}</small>
-                                    {% endif %}
-                                </div>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="alert alert-success mb-0">
-                    No unusual risk patterns detected right now.
-                </div>
+            <div style="font-size:12px;color:var(--muted);margin-bottom:8px;line-height:1.5;">{{ item.message }}</div>
+            <div style="font-size:12px;color:var(--text);margin-bottom:8px;">
+              Risk Score: <strong style="font-family:monospace;">{{ item.score }}</strong>
+            </div>
+            {% if item.suggestion %}
+              <div style="font-size:11px;color:var(--text);padding:6px 10px;background:rgba(255,255,255,0.05);border-radius:6px;border-left:2px solid rgba(255,255,255,0.2);">
+                ↳ {{ item.suggestion }}
+              </div>
             {% endif %}
-        </div>
-    </div>
-</div>
+            {% if item.module %}
+              <div style="font-size:10px;color:var(--muted);margin-top:8px;text-transform:uppercase;letter-spacing:.6px;">{{ item.module|title }}</div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="padding:20px 16px;text-align:center;">
+        <div style="font-size:22px;margin-bottom:8px;">✓</div>
+        <div style="font-size:13px;color:var(--muted);">No unusual risk patterns detected right now.</div>
+      </div>
+    {% endif %}
+  </div>
+
 {% endblock %}

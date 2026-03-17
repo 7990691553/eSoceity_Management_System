@@ -29,4 +29,12 @@ urlpatterns = [
 
     path("search/", views.search_page, name="search_page"),
     path("search/suggest/", views.search_suggest, name="search_suggest"),
+
+    path("visitor-logs/", views.visitor_log_list, name="visitor_log_list"),
+    path("visitor-logs/add/", views.add_visitor_log, name="add_visitor_log"),
+    path("visitor-logs/<int:pk>/edit/", views.edit_visitor_log, name="edit_visitor_log"),
+
+    path("child-logs/", views.child_log_list, name="child_log_list"),
+    path("child-logs/add/", views.add_child_log, name="add_child_log"),
+    path("child-logs/<int:pk>/edit/", views.edit_child_log, name="edit_child_log"),
 ]

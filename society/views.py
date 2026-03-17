@@ -8,10 +8,10 @@ from ai.services.copilot import generate_copilot_context
 
 from .decorators import role_required
 from .models import (
-    Visitor, Delivery, Child, StaffAttendance, SocietyNotice, SocietySettings
+    Visitor, Delivery, Child, StaffAttendance, SocietyNotice, SocietySettings, VisitorEntryLog, ChildEntryLog
 )
 from .forms import (
-    ChildAdminForm, VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm
+    ChildAdminForm, VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm, VisitorEntryLogForm , ChildEntryLogForm
 )
 
 
@@ -119,7 +119,17 @@ def visitor_list(request):
     else:
         visitors = Visitor.objects.filter(memberId=user).order_by("-createdAt")
 
-    return render(request, "society/visitor_list.html", {"visitors": visitors})
+     # ADD THESE 3 LINES ↓
+    pending_count  = visitors.filter(approvalStatus="PENDING").count()
+    approved_count = visitors.filter(approvalStatus="APPROVED").count()
+    rejected_count = visitors.filter(approvalStatus="REJECTED").count()
+
+    return render(request, "society/visitor_list.html", {
+        "visitors":       visitors,
+        "pending_count":  pending_count,   # ADD
+        "approved_count": approved_count,  # ADD
+        "rejected_count": rejected_count,  # ADD
+    })
 
 @login_required
 @role_required("chairman","super_admin")
@@ -382,3 +392,94 @@ def search_suggest(request):
 
     # limit total suggestions
     return JsonResponse({"items": items[:12]})
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def visitor_log_list(request):
+    logs = VisitorEntryLog.objects.order_by("-id")
+    context = {
+        "logs": logs,
+    }
+    return render(request, "society/visitor_log_list.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def add_visitor_log(request):
+    form = VisitorEntryLogForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("society:visitor_log_list")
+
+    context = {
+        "form": form,
+        "title": "Add Visitor Entry Log",
+    }
+    return render(request, "society/visitor_log_form.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def edit_visitor_log(request, pk):
+    log = get_object_or_404(VisitorEntryLog, pk=pk)
+    form = VisitorEntryLogForm(request.POST or None, instance=log)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("society:visitor_log_list")
+
+    context = {
+        "form": form,
+        "title": "Update Visitor Entry Log",
+        "log": log,
+    }
+    return render(request, "society/visitor_log_form.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def child_log_list(request):
+    logs = ChildEntryLog.objects.order_by("-id")
+    context = {
+        "logs": logs,
+    }
+    return render(request, "society/child_log_list.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def add_child_log(request):
+    form = ChildEntryLogForm(request.POST or None)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("society:child_log_list")
+
+    context = {
+        "form": form,
+        "title": "Add Child Entry Log",
+    }
+    return render(request, "society/child_log_form.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def edit_child_log(request, pk):
+    log = get_object_or_404(ChildEntryLog, pk=pk)
+    form = ChildEntryLogForm(request.POST or None, instance=log)
+
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            return redirect("society:child_log_list")
+
+    context = {
+        "form": form,
+        "title": "Update Child Entry Log",
+        "log": log,
+    }
+    return render(request, "society/child_log_form.html", context)

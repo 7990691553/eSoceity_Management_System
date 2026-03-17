@@ -4,79 +4,126 @@
 {% block page_subtitle %}Your visitors, deliveries, children and notices{% endblock %}
 
 {% block top_actions %}
-  <a class="btn btn-primary" href="{% url 'society:add_child' %}">+ Add Child</a>
+  <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
 {% endblock %}
 
 {% block content %}
-  <div class="grid">
 
-    <div class="card full">
-  <div class="card-header">
-    <h3>eSociety Copilot</h3>
-    <a class="link" href="{% url 'ai:copilot' %}">Open</a>
+  <!-- Stat cards -->
+  <div class="dash-grid cols-3" style="margin-bottom:14px;">
+    <div class="stat-card sc-purple">
+      <span class="stat-icon">👥</span>
+      <h3>My Visitors</h3>
+      <p class="big">{{ my_visitors|length }}</p>
+      <p class="muted">Recent records</p>
+    </div>
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">📦</span>
+      <h3>My Deliveries</h3>
+      <p class="big">{{ my_deliveries|length }}</p>
+      <p class="muted">Recent records</p>
+    </div>
+    <div class="stat-card sc-green">
+      <span class="stat-icon">👶</span>
+      <h3>Children</h3>
+      <p class="big">{{ my_children|default:my_deliveries|length|default:"—" }}</p>
+      <p class="muted">Registered</p>
+    </div>
   </div>
 
-  <p class="muted" style="margin-bottom: 12px;">
-    Get role-based updates, important notices, and your next recommended actions.
-  </p>
+  <!-- Visitors + Deliveries tables -->
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
 
-  <a href="{% url 'ai:copilot' %}" class="btn btn-primary">
-    Open Copilot
-  </a>
-</div>
-
-    <div class="card wide">
-      <h3>My Visitors</h3>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>My Visitors</h3>
+        <a class="link" href="{% url 'society:visitor_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead><tr><th>Name</th><th>Status</th><th>Created</th></tr></thead>
         <tbody>
           {% for v in my_visitors %}
             <tr>
-              <td>{{ v.visitorName }}</td>
-              <td>{{ v.approvalStatus }}</td>
-              <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+              <td><b>{{ v.visitorName }}</b></td>
+              <td>
+                {% if v.approvalStatus == "APPROVED" %}
+                  <span class="status-badge sb-approved">Approved</span>
+                {% elif v.approvalStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ v.approvalStatus }}</span>
+                {% endif %}
+              </td>
+              <td>{{ v.createdAt|date:"d M, h:i A" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3">No visitor records.</td></tr>
+            <tr><td colspan="3" class="muted">No visitor records.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <div class="card wide">
-      <h3>My Deliveries</h3>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>My Deliveries</h3>
+        <a class="link" href="{% url 'society:delivery_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead><tr><th>Person</th><th>Status</th><th>Created</th></tr></thead>
         <tbody>
           {% for d in my_deliveries %}
             <tr>
-              <td>{{ d.deliveryPerson }}</td>
-              <td>{{ d.deliveryStatus }}</td>
-              <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+              <td><b>{{ d.deliveryPerson }}</b></td>
+              <td>
+                {% if d.deliveryStatus == "COLLECTED" %}
+                  <span class="status-badge sb-collected">Collected</span>
+                {% elif d.deliveryStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ d.deliveryStatus }}</span>
+                {% endif %}
+              </td>
+              <td>{{ d.createdAt|date:"d M, h:i A" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3">No deliveries yet.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
-
-    <div class="card full">
-      <h3>Notices</h3>
-      <table class="table">
-        <thead><tr><th>Title</th><th>Date</th><th>Posted By</th></tr></thead>
-        <tbody>
-          {% for n in notices %}
-            <tr>
-              <td>{{ n.noticeTitle }}</td>
-              <td>{{ n.postedDate|date:"d M Y" }}</td>
-              <td>{{ n.postedBy.full_name }}</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="3">No notices available.</td></tr>
+            <tr><td colspan="3" class="muted">No deliveries yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
+
+  <!-- Notices + Copilot -->
+  <div class="dash-grid cols-2">
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Latest Notices</h3>
+        <a class="link" href="{% url 'society:notice_list' %}">View all →</a>
+      </div>
+      {% for n in notices %}
+        <div class="notice-row">
+          <div class="notice-dot" style="background:{% cycle '#6c63ff' '#f0a500' '#00d1b2' '#f05f6e' %}"></div>
+          <div>
+            <div class="notice-title">{{ n.noticeTitle }}</div>
+            <div class="notice-meta">{{ n.postedBy.full_name }} · {{ n.postedDate|date:"d M Y" }}</div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="muted" style="padding:14px 16px;">No notices available.</p>
+      {% endfor %}
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>AI Tools</h3></div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">eSociety Copilot</div>
+          <div class="action-desc">Role-based updates &amp; next actions</div>
+        </div>
+        <a href="{% url 'ai:copilot' %}" class="btn-action">Open →</a>
+      </div>
+    </div>
+  </div>
+
 {% endblock %}

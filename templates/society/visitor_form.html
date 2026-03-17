@@ -3,29 +3,176 @@
 {% block page_title %}Add Visitor{% endblock %}
 {% block page_subtitle %}Create a new visitor request{% endblock %}
 
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:visitor_list' %}">← Back to Visitors</a>
+{% endblock %}
+
 {% block content %}
-  <div class="card full">
-    <h3>Visitor Form</h3>
+
+<div class="dash-grid cols-21">
+
+  <!-- Form panel -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Visitor Details</h3>
+    </div>
 
     {% if form.non_field_errors %}
-      <div class="alert alert-error">{{ form.non_field_errors }}</div>
+      <div class="alert alert-error" style="margin:14px 16px 0;">
+        {{ form.non_field_errors }}
+      </div>
     {% endif %}
 
-    <form method="POST" class="form" novalidate>
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
       {% csrf_token %}
 
-      {% for field in form %}
-        <div>
-          <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-          {{ field }}
-          {% if field.errors %}
-            <div class="field-error">{{ field.errors|striptags }}</div>
-          {% endif %}
-        </div>
-      {% endfor %}
+      <!-- Visitor Name -->
+      <div class="form-field">
+        <label class="form-label" for="{{ form.visitorName.id_for_label }}">
+          Visitor Name <span style="color:var(--red-dim);color:#f05f6e;">*</span>
+        </label>
+        {{ form.visitorName }}
+        {% if form.visitorName.errors %}
+          <div class="field-error">{{ form.visitorName.errors|striptags }}</div>
+        {% endif %}
+      </div>
 
-      <button type="submit" class="btn btn-primary">Save Visitor</button>
-      <a class="btn btn-ghost" href="{% url 'society:visitor_list' %}">Cancel</a>
+      <!-- Visitor Type -->
+      <div class="form-field">
+        <label class="form-label" for="{{ form.visitorType.id_for_label }}">
+          Visitor Type <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.visitorType }}
+        {% if form.visitorType.errors %}
+          <div class="field-error">{{ form.visitorType.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Visit Purpose -->
+      <div class="form-field">
+        <label class="form-label" for="{{ form.visitPurpose.id_for_label }}">
+          Visit Purpose
+        </label>
+        {{ form.visitPurpose }}
+        {% if form.visitPurpose.errors %}
+          <div class="field-error">{{ form.visitPurpose.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Member -->
+      <div class="form-field">
+        <label class="form-label" for="{{ form.memberId.id_for_label }}">
+          Visiting Member <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.memberId }}
+        {% if form.memberId.errors %}
+          <div class="field-error">{{ form.memberId.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Prior Permission -->
+      <div class="form-field-check">
+        <label class="check-label">
+          {{ form.priorPermission }}
+          <span>Prior permission given by member</span>
+        </label>
+        {% if form.priorPermission.errors %}
+          <div class="field-error">{{ form.priorPermission.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Visitor</button>
+        <a class="btn btn-ghost" href="{% url 'society:visitor_list' %}">Cancel</a>
+      </div>
+
     </form>
   </div>
+
+  <!-- Help panel -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>Quick Guide</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:12px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:6px;background:var(--teal-dim,rgba(0,209,178,.12));border:1px solid rgba(0,209,178,.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">👤</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Guest</div>
+            <div style="font-size:11px;color:var(--muted);">Personal visitors, family members, friends.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:6px;background:rgba(108,99,255,.12);border:1px solid rgba(108,99,255,.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">🔧</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Service Provider</div>
+            <div style="font-size:11px;color:var(--muted);">Plumbers, electricians, delivery persons, vendors.</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span style="width:24px;height:24px;border-radius:6px;background:rgba(240,165,0,.12);border:1px solid rgba(240,165,0,.2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;">✓</span>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:2px;">Prior Permission</div>
+            <div style="font-size:11px;color:var(--muted);">Check this if the member has already approved this visitor verbally or via call.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>Status Flow</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-pending">Pending</span>
+          <span style="color:var(--muted);">→ Awaiting member approval</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-approved">Approved</span>
+          <span style="color:var(--muted);">→ Visitor may enter</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-rejected">Rejected</span>
+          <span style="color:var(--muted);">→ Access denied</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+.form-field-check {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.check-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+.check-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  accent-color: #5b7cfa;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+</style>
+
 {% endblock %}

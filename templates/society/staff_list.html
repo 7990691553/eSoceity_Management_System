@@ -1,34 +1,70 @@
 {% extends "society/base_society.html" %}
 {% block title %}Staff Attendance | eSociety{% endblock %}
 {% block page_title %}Staff Attendance{% endblock %}
-{% block page_subtitle %}Track daily attendance{% endblock %}
+{% block page_subtitle %}Daily attendance records for society staff{% endblock %}
 
 {% block top_actions %}
-  {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
-    <a class="btn btn-primary" href="{% url 'society:add_staff' %}">+ Mark Attendance</a>
-  {% endif %}
+  <a class="btn btn-primary btn-sm" href="{% url 'society:add_staff' %}">+ Mark Attendance</a>
 {% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Attendance Records</h3>
+
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
+    <div class="stat-card sc-green">
+      <span class="stat-icon">🪪</span>
+      <h3>Today's Count</h3>
+      <p class="big">{{ today_count|default:"0" }}</p>
+      <p class="muted">Staff marked today</p>
+    </div>
+    <div class="stat-card sc-purple">
+      <span class="stat-icon">📋</span>
+      <h3>Total Records</h3>
+      <p class="big">{{ total_count|default:"0" }}</p>
+      <p class="muted">All time</p>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Attendance Records</h3>
+      <a class="btn btn-primary btn-sm" href="{% url 'society:add_staff' %}">+ Mark Attendance</a>
+    </div>
     <table class="table">
       <thead>
-        <tr><th>Name</th><th>Role</th><th>Date</th><th>In</th><th>Out</th></tr>
+        <tr>
+          <th>Name</th>
+          <th>Role</th>
+          <th>Date</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+          <th>Marked By</th>
+        </tr>
       </thead>
       <tbody>
-        {% for s in staff %}
+        {% for s in staff_list %}
           <tr>
-            <td>{{ s.staffName }}</td>
-            <td>{{ s.staffRole }}</td>
-            <td>{{ s.attendanceDate|date:"d M Y" }}</td>
-            <td>{{ s.staffInTime }}</td>
-            <td>{{ s.staffOutTime }}</td>
+            <td style="font-weight:600;color:var(--text);">{{ s.staffName }}</td>
+            <td>
+              {% if s.staffRole == "SECURITY" %}
+                <span class="status-badge sb-service">Security</span>
+              {% else %}
+                <span class="status-badge sb-guest">Helper</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);font-size:12px;">{{ s.attendanceDate|date:"d M Y" }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ s.staffInTime }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ s.staffOutTime }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ s.markedBy.full_name|default:"—" }}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="5">No attendance records found.</td></tr>
+          <tr>
+            <td colspan="6" style="text-align:center;padding:28px;color:var(--muted);">
+              No attendance records yet.
+            </td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
 {% endblock %}

@@ -5,11 +5,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>{% block title %}eSociety{% endblock %}</title>
-
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-
   <link rel="stylesheet" href="{% static 'society/css/society.css' %}">
 </head>
 <body>
@@ -20,10 +18,26 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="logo">eS</div>
+      {% if request.user.role == "security" %}
+        <div class="logo role-security">eS</div>
+      {% elif request.user.role == "member" %}
+        <div class="logo role-member">eS</div>
+      {% elif request.user.role == "helper" %}
+        <div class="logo role-helper">eS</div>
+      {% else %}
+        <div class="logo">eS</div>
+      {% endif %}
       <div class="text">
         <h1>eSociety</h1>
-        <p>Society management portal</p>
+        {% if request.user.role == "security" %}
+          <p>Security portal</p>
+        {% elif request.user.role == "member" %}
+          <p>Resident portal</p>
+        {% elif request.user.role == "helper" %}
+          <p>Helper portal</p>
+        {% else %}
+          <p>Management portal</p>
+        {% endif %}
       </div>
     </div>
 
@@ -31,6 +45,7 @@
     <nav class="nav">
       <a href="{% url 'society:dashboard_redirect' %}"
          class="{% if current == 'dashboard_redirect' or current == 'admin_dashboard' or current == 'security_dashboard' or current == 'member_dashboard' or current == 'helper_dashboard' %}active{% endif %}">
+        <span class="nav-icon">▪</span>
         Dashboard
         <span class="badge">
           {% if request.user.is_superuser %}superuser{% else %}{{ request.user.role|default:"user" }}{% endif %}
@@ -41,42 +56,61 @@
     {% if request.user.is_superuser %}
       <div class="nav-section">Gate</div>
       <nav class="nav">
-        <a href="{% url 'society:visitor_list' %}" class="{% if current == 'visitor_list' or current == 'add_visitor' %}active{% endif %}">Visitors</a>
-        <a href="{% url 'society:delivery_list' %}" class="{% if current == 'delivery_list' or current == 'add_delivery' %}active{% endif %}">Deliveries</a>
+        <a href="{% url 'society:visitor_list' %}" class="{% if current == 'visitor_list' or current == 'add_visitor' %}active{% endif %}">
+          <span class="nav-icon">👥</span> Visitors
+        </a>
+        <a href="{% url 'society:delivery_list' %}" class="{% if current == 'delivery_list' or current == 'add_delivery' %}active{% endif %}">
+          <span class="nav-icon">📦</span> Deliveries
+        </a>
       </nav>
-
       <div class="nav-section">Records</div>
       <nav class="nav">
-        <a href="{% url 'society:staff_list' %}" class="{% if current == 'staff_list' or current == 'add_staff' %}active{% endif %}">Staff Attendance</a>
-        <a href="{% url 'society:child_list' %}" class="{% if current == 'child_list' or current == 'add_child' %}active{% endif %}">Children</a>
+        <a href="{% url 'society:staff_list' %}" class="{% if current == 'staff_list' or current == 'add_staff' %}active{% endif %}">
+          <span class="nav-icon">🪪</span> Staff Attendance
+        </a>
+        <a href="{% url 'society:child_list' %}" class="{% if current == 'child_list' or current == 'add_child' %}active{% endif %}">
+          <span class="nav-icon">👶</span> Children
+        </a>
       </nav>
 
     {% else %}
       {% if request.user.role == "chairman" or request.user.role == "super_admin" or request.user.role == "security" %}
         <div class="nav-section">Gate</div>
         <nav class="nav">
-          <a href="{% url 'society:visitor_list' %}" class="{% if current == 'visitor_list' or current == 'add_visitor' %}active{% endif %}">Visitors</a>
-          <a href="{% url 'society:delivery_list' %}" class="{% if current == 'delivery_list' or current == 'add_delivery' %}active{% endif %}">Deliveries</a>
+          <a href="{% url 'society:visitor_list' %}" class="{% if current == 'visitor_list' or current == 'add_visitor' %}active{% endif %}">
+            <span class="nav-icon">👥</span> Visitors
+          </a>
+          <a href="{% url 'society:delivery_list' %}" class="{% if current == 'delivery_list' or current == 'add_delivery' %}active{% endif %}">
+            <span class="nav-icon">📦</span> Deliveries
+          </a>
         </nav>
       {% endif %}
-
       <div class="nav-section">Records</div>
       <nav class="nav">
         {% if request.user.role == "chairman" or request.user.role == "super_admin" or request.user.role == "security" %}
-          <a href="{% url 'society:staff_list' %}" class="{% if current == 'staff_list' or current == 'add_staff' %}active{% endif %}">Staff Attendance</a>
+          <a href="{% url 'society:staff_list' %}" class="{% if current == 'staff_list' or current == 'add_staff' %}active{% endif %}">
+            <span class="nav-icon">🪪</span> Staff Attendance
+          </a>
         {% endif %}
-
         {% if request.user.role == "chairman" or request.user.role == "super_admin" or request.user.role == "member" or request.user.role == "security" %}
-          <a href="{% url 'society:child_list' %}" class="{% if current == 'child_list' or current == 'add_child' %}active{% endif %}">Children</a>
+          <a href="{% url 'society:child_list' %}" class="{% if current == 'child_list' or current == 'add_child' %}active{% endif %}">
+            <span class="nav-icon">👶</span> Children
+          </a>
         {% endif %}
       </nav>
     {% endif %}
 
     <div class="nav-section">Community</div>
     <nav class="nav">
-      <a href="{% url 'society:notice_list' %}" class="{% if current == 'notice_list' or current == 'add_notice' %}active{% endif %}">Notices</a>
-      <a href="{% url 'society:search_page' %}" class="{% if current == 'search_page' %}active{% endif %}">Search</a>
-      <a href="{% url 'ai:dashboard' %}" class="{% if current == 'dashboard' %}active{% endif %}">AI Insights</a>
+      <a href="{% url 'society:notice_list' %}" class="{% if current == 'notice_list' or current == 'add_notice' %}active{% endif %}">
+        <span class="nav-icon">📢</span> Notices
+      </a>
+      <a href="{% url 'society:search_page' %}" class="{% if current == 'search_page' %}active{% endif %}">
+        <span class="nav-icon">🔍</span> Search
+      </a>
+      <a href="{% url 'ai:dashboard' %}" class="{% if current == 'dashboard' %}active{% endif %}">
+        <span class="nav-icon">🤖</span> AI Insights
+      </a>
     </nav>
 
     <div class="sidebar-footer">
@@ -85,15 +119,13 @@
         <div><b>{{ request.user.full_name|default:request.user.email }}</b></div>
         <div class="muted">{{ request.user.email }}</div>
       </div>
-
-      {# Replace with real logout later #}
-      <div style="margin-top: 10px;">
-        <a class="btn btn-ghost"
+      <div style="margin-top:10px;">
+        <a class="btn btn-ghost btn-sm"
            href="{% url 'core:logout' %}"
            onclick="return confirmLogout()"
            style="width:100%; justify-content:center;">
-           Logout
-       </a>
+          Logout
+        </a>
       </div>
     </div>
   </aside>
@@ -105,25 +137,16 @@
         <h2>{% block page_title %}Dashboard{% endblock %}</h2>
         <p>{% block page_subtitle %}Welcome to eSociety{% endblock %}</p>
       </div>
-
-      <!-- Compact toolbar -->
       <div class="actions">
         <div class="search-wrap">
-          <form action="{% url 'society:search_page' %}" method="GET" style="display:flex; gap:8px; align-items:center;">
-            <input
-              class="input search-input"
-              type="text"
-              name="q"
-              id="globalSearch"
-              placeholder="Search..."
-              autocomplete="off"
-            />
-            <button class="btn btn-primary" type="submit">Search</button>
+          <form action="{% url 'society:search_page' %}" method="GET">
+            <div class="search-fused">
+              <input type="text" name="q" id="globalSearch" placeholder="Search..." autocomplete="off"/>
+              <button type="submit">Search</button>
+            </div>
           </form>
-
           <div id="suggestBox" class="suggest-box"></div>
         </div>
-
         {% block top_actions %}{% endblock %}
       </div>
     </div>
@@ -147,53 +170,33 @@
   const input = document.getElementById("globalSearch");
   const box = document.getElementById("suggestBox");
   let timer = null;
-
-  function hideBox() {
-    if (!box) return;
-    box.style.display = "none";
-    box.innerHTML = "";
-  }
-
+  function hideBox() { if(!box) return; box.style.display="none"; box.innerHTML=""; }
   function renderItems(items) {
-    if (!box) return;
-    if (!items || items.length === 0) {
-      hideBox();
-      return;
-    }
-    box.innerHTML = items.map(it => `<a href="${it.url}">${it.label}</a>`).join("");
+    if(!box) return;
+    if(!items||items.length===0){hideBox();return;}
+    box.innerHTML = items.map(it=>`<a href="${it.url}">${it.label}</a>`).join("");
     box.style.display = "block";
   }
-
   async function fetchSuggest(q) {
-    const url = "{% url 'society:search_suggest' %}" + "?q=" + encodeURIComponent(q);
-    const res = await fetch(url, {headers: {"X-Requested-With":"XMLHttpRequest"}});
+    const url = "{% url 'society:search_suggest' %}"+"?q="+encodeURIComponent(q);
+    const res = await fetch(url,{headers:{"X-Requested-With":"XMLHttpRequest"}});
     const data = await res.json();
     renderItems(data.items);
   }
-
-  if (input) {
-    input.addEventListener("input", function() {
-      const q = input.value.trim();
-      clearTimeout(timer);
-
-      if (q.length < 2) {
-        hideBox();
-        return;
-      }
-
-      timer = setTimeout(() => fetchSuggest(q), 180);
+  if(input){
+    input.addEventListener("input",function(){
+      const q=input.value.trim(); clearTimeout(timer);
+      if(q.length<2){hideBox();return;}
+      timer=setTimeout(()=>fetchSuggest(q),180);
     });
-
-    document.addEventListener("click", function(e) {
-      if (box && !box.contains(e.target) && e.target !== input) hideBox();
+    document.addEventListener("click",function(e){
+      if(box&&!box.contains(e.target)&&e.target!==input) hideBox();
     });
   }
 })();
 </script>
 <script>
-function confirmLogout() {
-    return confirm("Are you sure you want to logout?");
-}
+function confirmLogout() { return confirm("Are you sure you want to logout?"); }
 </script>
 
 </body>

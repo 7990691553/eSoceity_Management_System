@@ -4,63 +4,43 @@
 {% block page_subtitle %}Society overview and quick stats{% endblock %}
 
 {% block content %}
-  <div class="grid">
-    <div class="card small">
+
+  <!-- Stat cards row -->
+  <div class="dash-grid cols-4" style="margin-bottom:14px;">
+    <div class="stat-card sc-purple">
+      <span class="stat-icon">👥</span>
       <h3>Total Visitors</h3>
       <p class="big">{{ visitor_count }}</p>
       <p class="muted">All time</p>
     </div>
-
-    <div class="card small">
+    <div class="stat-card sc-teal">
+      <span class="stat-icon">📦</span>
       <h3>Total Deliveries</h3>
       <p class="big">{{ delivery_count }}</p>
       <p class="muted">All time</p>
     </div>
-
-    <div class="card small">
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">👶</span>
       <h3>Children Profiles</h3>
       <p class="big">{{ child_count }}</p>
       <p class="muted">Registered</p>
     </div>
-
-    <div class="card small">
+    <div class="stat-card sc-green">
+      <span class="stat-icon">🪪</span>
       <h3>Staff Today</h3>
       <p class="big">{{ staff_today }}</p>
       <p class="muted">Attendance marked</p>
     </div>
-
-    <div class="card full">
-  <div class="card-header">
-    <h3>eSociety Copilot</h3>
-    <a class="link" href="{% url 'ai:copilot' %}">Open</a>
   </div>
 
-  <p class="muted" style="margin-bottom: 12px;">
-    Get AI-powered role-based guidance, priority tasks, and recommended next actions.
-  </p>
+  <!-- Visitors table + AI tools -->
+  <div class="dash-grid cols-21" style="margin-bottom:14px;">
 
-  <a href="{% url 'ai:copilot' %}" class="btn btn-primary">
-    Open Copilot
-  </a>
-</div>
-
-    <div class="card full">
-      <div class="card-header">
-      <h3>AI Insights</h3>
-      <a class="link" href="{% url 'ai:dashboard' %}">Open</a>
-    </div>
-
-    <p class="muted" style="margin-bottom: 12px;">
-      View intelligent analytics about visitors, deliveries, and society activity.
-    </p>
-
-      <a href="{% url 'ai:dashboard' %}" class="btn btn-primary">
-        View AI Insights
-      </a>
-    </div>
-
-    <div class="card wide">
-      <h3>Recent Visitors</h3>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Visitors</h3>
+        <a class="link" href="{% url 'society:visitor_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead>
           <tr><th>Name</th><th>Type</th><th>Status</th><th>Created</th></tr>
@@ -68,20 +48,87 @@
         <tbody>
           {% for v in recent_visitors %}
             <tr>
-              <td>{{ v.visitorName }}</td>
-              <td>{{ v.visitorType }}</td>
-              <td>{{ v.approvalStatus }}</td>
-              <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+              <td><b>{{ v.visitorName }}</b></td>
+              <td>
+                {% if v.visitorType == "GUEST" %}
+                  <span class="status-badge sb-guest">Guest</span>
+                {% else %}
+                  <span class="status-badge sb-service">{{ v.visitorType }}</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if v.approvalStatus == "APPROVED" %}
+                  <span class="status-badge sb-approved">Approved</span>
+                {% elif v.approvalStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ v.approvalStatus }}</span>
+                {% endif %}
+              </td>
+              <td>{{ v.createdAt|date:"d M, h:i A" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="4">No visitors yet.</td></tr>
+            <tr><td colspan="4" class="muted">No visitors yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <div class="card wide">
-      <h3>Recent Deliveries</h3>
+    <!-- AI tools panel — compact rows instead of giant cards -->
+    <div class="panel-card" style="display:flex;flex-direction:column;">
+      <div class="panel-header">
+        <h3>AI Tools</h3>
+      </div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">eSociety Copilot</div>
+          <div class="action-desc">Role-based guidance &amp; tasks</div>
+        </div>
+        <a href="{% url 'ai:copilot' %}" class="btn-action">Open →</a>
+      </div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">AI Insights</div>
+          <div class="action-desc">Analytics &amp; visitor trends</div>
+        </div>
+        <a href="{% url 'ai:dashboard' %}" class="btn-action">View →</a>
+      </div>
+
+      <!-- Society health score -->
+      <div style="border-top:1px solid var(--border);">
+        <div class="panel-header" style="padding-bottom:0;">
+          <h3>Society Health</h3>
+          <a class="link" href="{% url 'ai:dashboard' %}">Details →</a>
+        </div>
+        <div class="health-wrap">
+          <div class="health-ring">
+            <svg width="84" height="84" viewBox="0 0 84 84">
+              <circle cx="42" cy="42" r="34" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="7"/>
+              <circle cx="42" cy="42" r="34" fill="none" stroke="#00d1b2" stroke-width="7"
+                stroke-dasharray="213.6" stroke-dashoffset="47" stroke-linecap="round"/>
+            </svg>
+            <div class="health-num">78</div>
+          </div>
+          <div class="health-grade">GOOD</div>
+          <div class="health-lbl">Updated 2 hrs ago</div>
+        </div>
+        <div class="health-rows">
+          <div class="health-row"><span>Visitor load</span><span style="color:#00d1b2;">Normal</span></div>
+          <div class="health-row"><span>Delivery backlog</span><span style="color:#f0a500;">Moderate</span></div>
+          <div class="health-row"><span>Risk level</span><span style="color:#2dd4a0;">Low</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deliveries + Notices -->
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recent Deliveries</h3>
+        <a class="link" href="{% url 'society:delivery_list' %}">View all →</a>
+      </div>
       <table class="table">
         <thead>
           <tr><th>Person</th><th>Status</th><th>Member</th><th>Created</th></tr>
@@ -89,36 +136,43 @@
         <tbody>
           {% for d in recent_deliveries %}
             <tr>
-              <td>{{ d.deliveryPerson }}</td>
-              <td>{{ d.deliveryStatus }}</td>
+              <td><b>{{ d.deliveryPerson }}</b></td>
+              <td>
+                {% if d.deliveryStatus == "COLLECTED" %}
+                  <span class="status-badge sb-collected">Collected</span>
+                {% elif d.deliveryStatus == "PENDING" %}
+                  <span class="status-badge sb-pending">Pending</span>
+                {% else %}
+                  <span class="status-badge sb-rejected">{{ d.deliveryStatus }}</span>
+                {% endif %}
+              </td>
               <td>{{ d.memberId.full_name }}</td>
-              <td>{{ d.createdAt|date:"d M Y, h:i A" }}</td>
+              <td>{{ d.createdAt|date:"d M, h:i A" }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="4">No deliveries yet.</td></tr>
+            <tr><td colspan="4" class="muted">No deliveries yet.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <div class="card full">
-      <h3>Latest Notices</h3>
-      <table class="table">
-        <thead>
-          <tr><th>Title</th><th>Posted By</th><th>Date</th></tr>
-        </thead>
-        <tbody>
-          {% for n in recent_notices %}
-            <tr>
-              <td>{{ n.noticeTitle }}</td>
-              <td>{{ n.postedBy.full_name }}</td>
-              <td>{{ n.postedDate|date:"d M Y" }}</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="3">No notices yet.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Latest Notices</h3>
+        <a class="link" href="{% url 'society:notice_list' %}">View all →</a>
+      </div>
+      {% for n in recent_notices %}
+        <div class="notice-row">
+          <div class="notice-dot" style="background:{% cycle '#6c63ff' '#f0a500' '#00d1b2' '#f05f6e' %}"></div>
+          <div>
+            <div class="notice-title">{{ n.noticeTitle }}</div>
+            <div class="notice-meta">{{ n.postedBy.full_name }} · {{ n.postedDate|date:"d M Y" }}</div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="muted" style="padding:14px 16px;">No notices yet.</p>
+      {% endfor %}
     </div>
   </div>
+
 {% endblock %}

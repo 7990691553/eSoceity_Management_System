@@ -4,39 +4,41 @@
 {% block page_subtitle %}Notices and updates{% endblock %}
 
 {% block content %}
-  <div class="grid">
 
-    <div class="card full">
-    <div class="card-header">
-      <h3>eSociety Copilot</h3>
-      <a class="link" href="{% url 'ai:copilot' %}">Open</a>
+  <!-- Copilot + Notices -->
+  <div class="dash-grid cols-1" style="margin-bottom:14px;">
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>AI Tools</h3></div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">eSociety Copilot</div>
+          <div class="action-desc">Daily instructions, notices, and AI-guided workday updates</div>
+        </div>
+        <a href="{% url 'ai:copilot' %}" class="btn-action">Open →</a>
+      </div>
     </div>
 
-    <p class="muted" style="margin-bottom: 12px;">
-       Check daily instructions, important notices, and AI-guided workday updates.
-    </p>
-
-  <a href="{% url 'ai:copilot' %}" class="btn btn-primary">
-    Open Copilot
-  </a>
   </div>
 
-    <div class="card full">
-      <h3>Notices</h3>
-      <table class="table">
-        <thead><tr><th>Title</th><th>Date</th><th>Posted By</th></tr></thead>
-        <tbody>
-          {% for n in notices %}
-            <tr>
-              <td>{{ n.noticeTitle }}</td>
-              <td>{{ n.postedDate|date:"d M Y" }}</td>
-              <td>{{ n.postedBy.full_name }}</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="3">No notices available.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
+  <div class="dash-grid cols-1">
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Notices</h3>
+        <a class="link" href="{% url 'society:notice_list' %}">View all →</a>
+      </div>
+      {% for n in notices %}
+        <div class="notice-row">
+          <div class="notice-dot" style="background:{% cycle '#6c63ff' '#f0a500' '#00d1b2' '#f05f6e' %}"></div>
+          <div>
+            <div class="notice-title">{{ n.noticeTitle }}</div>
+            <div class="notice-meta">{{ n.postedBy.full_name }} · {{ n.postedDate|date:"d M Y" }}</div>
+          </div>
+        </div>
+      {% empty %}
+        <p class="muted" style="padding:14px 16px;">No notices available.</p>
+      {% endfor %}
     </div>
   </div>
+
 {% endblock %}

@@ -1,74 +1,133 @@
 {% extends "society/base_society.html" %}
+{% block title %}eSociety Copilot | eSociety{% endblock %}
+{% block page_title %}{{ copilot.heading }}{% endblock %}
+{% block page_subtitle %}Role-based AI guidance and recommended actions{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:dashboard_redirect' %}">← Back to Dashboard</a>
+{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2>{{ copilot.heading }}</h2>
-        <a href="{% url 'society:dashboard_redirect' %}" class="btn btn-outline-secondary">Back to Dashboard</a>
+
+  <!-- Summary + Recommended Action -->
+  <div class="dash-grid cols-2" style="margin-bottom:14px;">
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>AI Summary</h3>
+      </div>
+      <div style="padding:16px;font-size:13px;color:var(--text);line-height:1.7;">
+        {{ copilot.summary }}
+      </div>
     </div>
 
-    <!-- Summary -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="card-title">AI Summary</h4>
-            <p class="mb-0">{{ copilot.summary }}</p>
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Recommended Next Action</h3>
+      </div>
+      <div style="padding:16px;">
+        <div style="
+          font-size:13px;
+          color:var(--text);
+          line-height:1.7;
+          padding:14px;
+          border-radius:10px;
+          background:rgba(91,124,250,0.08);
+          border:1px solid rgba(91,124,250,0.2);
+          border-left:3px solid #5b7cfa;
+        ">
+          {{ copilot.recommended_action }}
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Recommended Action -->
-    <div class="card shadow-sm mb-4 border-0 bg-light">
-        <div class="card-body">
-            <h4 class="card-title">Recommended Next Action</h4>
-            <p class="mb-0"><strong>{{ copilot.recommended_action }}</strong></p>
+  <!-- Status Cards (if any) -->
+  {% if copilot.status_cards %}
+    <div class="dash-grid cols-4" style="margin-bottom:14px;">
+      {% for card in copilot.status_cards %}
+        <div class="stat-card sc-purple">
+          <h3>{{ card.label }}</h3>
+          <p class="big">{{ card.value }}</p>
         </div>
+      {% endfor %}
     </div>
+  {% endif %}
 
-    <!-- Status Cards -->
-    {% if copilot.status_cards %}
-    <div class="row mb-4">
-        {% for card in copilot.status_cards %}
-        <div class="col-md-6 col-lg-3 mb-3">
-            <div class="card shadow-sm h-100">
-                <div class="card-body text-center">
-                    <h6 class="text-muted">{{ card.label }}</h6>
-                    <h3 class="mb-0">{{ card.value }}</h3>
-                </div>
-            </div>
-        </div>
+  <!-- Priority Tasks + Tips -->
+  <div class="dash-grid cols-2">
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Priority Tasks</h3>
+        {% if copilot.priority_tasks %}
+          <span class="status-badge sb-pending">{{ copilot.priority_tasks|length }} task{{ copilot.priority_tasks|length|pluralize }}</span>
+        {% endif %}
+      </div>
+      {% if copilot.priority_tasks %}
+        {% for task in copilot.priority_tasks %}
+          <div style="
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+            padding:11px 16px;
+            border-bottom:1px solid var(--border);
+            font-size:13px;
+            color:var(--text);
+            line-height:1.5;
+          ">
+            <span style="
+              width:20px;height:20px;
+              border-radius:50%;
+              background:rgba(240,165,0,0.15);
+              border:1px solid rgba(240,165,0,0.3);
+              color:#f0a500;
+              font-size:10px;
+              font-weight:700;
+              display:flex;align-items:center;justify-content:center;
+              flex-shrink:0;margin-top:1px;
+            ">{{ forloop.counter }}</span>
+            {{ task }}
+          </div>
         {% endfor %}
-    </div>
-    {% endif %}
-
-    <!-- Priority Tasks -->
-    <div class="card shadow-sm mb-4">
-        <div class="card-body">
-            <h4 class="card-title">Priority Tasks</h4>
-            {% if copilot.priority_tasks %}
-                <ul class="mb-0">
-                    {% for task in copilot.priority_tasks %}
-                        <li class="mb-2">{{ task }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="mb-0">No high-priority tasks right now.</p>
-            {% endif %}
+      {% else %}
+        <div style="padding:20px 16px;text-align:center;">
+          <div style="font-size:22px;margin-bottom:8px;">✓</div>
+          <div style="font-size:13px;color:var(--muted);">No high-priority tasks right now.</div>
         </div>
+      {% endif %}
     </div>
 
-    <!-- Tips -->
-    <div class="card shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title">AI Tips</h4>
-            {% if copilot.tips %}
-                <ul class="mb-0">
-                    {% for tip in copilot.tips %}
-                        <li class="mb-2">{{ tip }}</li>
-                    {% endfor %}
-                </ul>
-            {% else %}
-                <p class="mb-0">No additional tips available.</p>
-            {% endif %}
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>AI Tips</h3>
+        {% if copilot.tips %}
+          <span class="status-badge sb-guest">{{ copilot.tips|length }} tip{{ copilot.tips|length|pluralize }}</span>
+        {% endif %}
+      </div>
+      {% if copilot.tips %}
+        {% for tip in copilot.tips %}
+          <div style="
+            display:flex;
+            align-items:flex-start;
+            gap:10px;
+            padding:11px 16px;
+            border-bottom:1px solid var(--border);
+            font-size:13px;
+            color:var(--muted);
+            line-height:1.5;
+          ">
+            <span style="color:#15d3c2;flex-shrink:0;margin-top:2px;">→</span>
+            {{ tip }}
+          </div>
+        {% endfor %}
+      {% else %}
+        <div style="padding:20px 16px;text-align:center;">
+          <div style="font-size:13px;color:var(--muted);">No additional tips available.</div>
         </div>
+      {% endif %}
     </div>
-</div>
+
+  </div>
+
 {% endblock %}

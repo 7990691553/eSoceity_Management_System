@@ -5,32 +5,94 @@
 
 {% block top_actions %}
   {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
-    <a class="btn btn-primary" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
+    <a class="btn btn-primary btn-sm" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
   {% endif %}
 {% endblock %}
 
 {% block content %}
-  <div class="card full">
-    <h3>Visitor List</h3>
+
+  <!-- Stat strip — counts passed from view -->
+  <div class="dash-grid cols-3" style="margin-bottom:14px;">
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">⏳</span>
+      <h3>Pending</h3>
+      <p class="big">{{ pending_count|default:"0" }}</p>
+      <p class="muted">Awaiting approval</p>
+    </div>
+    <div class="stat-card sc-green">
+      <span class="stat-icon">✓</span>
+      <h3>Approved</h3>
+      <p class="big">{{ approved_count|default:"0" }}</p>
+      <p class="muted">Access granted</p>
+    </div>
+    <div class="stat-card sc-red">
+      <span class="stat-icon">✕</span>
+      <h3>Rejected</h3>
+      <p class="big">{{ rejected_count|default:"0" }}</p>
+      <p class="muted">Access denied</p>
+    </div>
+  </div>
+
+  <!-- Visitor table -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Visitors</h3>
+      {% if request.user.is_superuser or request.user.role in "security chairman super_admin" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'society:add_visitor' %}">+ Add Visitor</a>
+      {% endif %}
+    </div>
     <table class="table">
       <thead>
         <tr>
-          <th>Name</th><th>Type</th><th>Status</th><th>Member</th><th>Created</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Purpose</th>
+          <th>Status</th>
+          <th>Member</th>
+          <th>Prior Permission</th>
+          <th>Created</th>
         </tr>
       </thead>
       <tbody>
         {% for v in visitors %}
           <tr>
-            <td>{{ v.visitorName }}</td>
-            <td>{{ v.visitorType }}</td>
-            <td>{{ v.approvalStatus }}</td>
-            <td>{{ v.memberId.full_name }}</td>
-            <td>{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+            <td style="font-weight:600;color:var(--text);">{{ v.visitorName }}</td>
+            <td>
+              {% if v.visitorType == "GUEST" %}
+                <span class="status-badge sb-guest">Guest</span>
+              {% else %}
+                <span class="status-badge sb-service">Service</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);">{{ v.visitPurpose|default:"—" }}</td>
+            <td>
+              {% if v.approvalStatus == "APPROVED" %}
+                <span class="status-badge sb-approved">Approved</span>
+              {% elif v.approvalStatus == "PENDING" %}
+                <span class="status-badge sb-pending">Pending</span>
+              {% else %}
+                <span class="status-badge sb-rejected">Rejected</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);">{{ v.memberId.full_name }}</td>
+            <td>
+              {% if v.priorPermission %}
+                <span class="status-badge sb-approved">Yes</span>
+              {% else %}
+                <span class="status-badge sb-pending">No</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);font-size:12px;">{{ v.createdAt|date:"d M Y, h:i A" }}</td>
           </tr>
         {% empty %}
-          <tr><td colspan="5">No visitor records found.</td></tr>
+          <tr>
+            <td colspan="7" style="text-align:center;padding:28px;color:var(--muted);">
+              No visitor records found.
+            </td>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+
 {% endblock %}
