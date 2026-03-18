@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.timezone import now
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -165,14 +165,22 @@ def add_visitor(request):
 @login_required
 def delivery_list(request):
     user = request.user
-
+ 
     if user.is_superuser or getattr(user, "role", None) in ("chairman", "super_admin", "security"):
         deliveries = Delivery.objects.all().order_by("-createdAt")
     else:
         deliveries = Delivery.objects.filter(memberId=user).order_by("-createdAt")
-
-    return render(request, "society/delivery_list.html", {"deliveries": deliveries})
-
+ 
+    pending_count   = deliveries.filter(deliveryStatus="PENDING").count()
+    collected_count = deliveries.filter(deliveryStatus="COLLECTED").count()
+    stored_count    = deliveries.filter(storedAtSecurity=True).count()
+ 
+    return render(request, "society/delivery_list.html", {
+        "deliveries":      deliveries,
+        "pending_count":   pending_count,
+        "collected_count": collected_count,
+        "stored_count":    stored_count,
+    })
 
 @login_required
 @role_required("security", "chairman", "super_admin")
@@ -199,14 +207,22 @@ def add_delivery(request):
 @login_required
 def child_list(request):
     user = request.user
-
+ 
     if user.is_superuser or getattr(user, "role", None) in ("chairman", "super_admin", "security"):
         children = Child.objects.all().order_by("childName")
     else:
         children = Child.objects.filter(parentId=user).order_by("childName")
-
-    return render(request, "society/child_list.html", {"children": children})
-
+ 
+    settings_obj = get_settings()
+ 
+    total_count = children.count()
+    age_limit   = settings_obj.defaultAgeLimit
+ 
+    return render(request, "society/child_list.html", {
+        "children":    children,
+        "total_count": total_count,
+        "age_limit":   age_limit,
+    })
 
 @login_required
 @role_required("member", "chairman", "super_admin")
@@ -237,9 +253,17 @@ def add_child(request):
 
 @login_required
 def staff_list(request):
-    staff = StaffAttendance.objects.all().order_by("-attendanceDate")
-    return render(request, "society/staff_list.html", {"staff": staff})
-
+    from django.utils import timezone
+    staff_list = StaffAttendance.objects.all().order_by("-attendanceDate")
+ 
+    today_count = staff_list.filter(attendanceDate=timezone.now().date()).count()
+    total_count = staff_list.count()
+ 
+    return render(request, "society/staff_list.html", {
+        "staff_list":  staff_list,
+        "today_count": today_count,
+        "total_count": total_count,
+    })
 
 @login_required
 @role_required("security", "chairman", "super_admin")

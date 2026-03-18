@@ -108,9 +108,11 @@
       <a href="{% url 'society:search_page' %}" class="{% if current == 'search_page' %}active{% endif %}">
         <span class="nav-icon">🔍</span> Search
       </a>
+      {% if request.user.is_superuser or request.user.role in "super_admin chairman" %}
       <a href="{% url 'ai:dashboard' %}" class="{% if current == 'dashboard' %}active{% endif %}">
         <span class="nav-icon">🤖</span> AI Insights
-      </a>
+       </a>
+      {% endif %}
     </nav>
 
     <div class="sidebar-footer">

@@ -3,9 +3,6 @@
 {% block page_title %}Children{% endblock %}
 {% block page_subtitle %}Registered children profiles and monitoring{% endblock %}
 
-{% block top_actions %}
-  <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
-{% endblock %}
 
 {% block content %}
 
@@ -27,7 +24,9 @@
   <div class="panel-card">
     <div class="panel-header">
       <h3>All Children</h3>
-      <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
+      {% if request.user.is_superuser or request.user.role in "chairman super_admin member" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'society:add_child' %}">+ Add Child</a>
+      {% endif %}
     </div>
     <table class="table">
       <thead>
