@@ -1,0 +1,173 @@
+{% extends "society/base_society.html" %}
+{% block title %}Complaint #{{ complaint.pk }} | eSociety{% endblock %}
+{% block page_title %}Complaint #{{ complaint.pk }}{% endblock %}
+{% block page_subtitle %}{{ complaint.title }}{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:complaint_list' %}">← Back to Complaints</a>
+  {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+    <a class="btn btn-primary btn-sm" href="{% url 'society:update_complaint' complaint.pk %}">Update Status</a>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid cols-21">
+
+  <!-- Main complaint info -->
+  <div style="display:flex;flex-direction:column;gap:14px;">
+
+    <div class="panel-card">
+      <div class="panel-header">
+        <h3>Complaint Details</h3>
+        {% if complaint.status == "OPEN" %}
+          <span class="status-badge sb-rejected">Open</span>
+        {% elif complaint.status == "IN_PROGRESS" %}
+          <span class="status-badge sb-pending">In Progress</span>
+        {% elif complaint.status == "RESOLVED" %}
+          <span class="status-badge sb-approved">Resolved</span>
+        {% else %}
+          <span class="status-badge sb-guest">Closed</span>
+        {% endif %}
+      </div>
+
+      <div style="padding:16px;display:flex;flex-direction:column;gap:14px;">
+
+        <!-- Title + description -->
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;">Title</div>
+          <div style="font-size:14px;font-weight:600;color:var(--text);">{{ complaint.title }}</div>
+        </div>
+
+        <div>
+          <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:6px;">Description</div>
+          <div style="font-size:13px;color:var(--text);line-height:1.7;background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:8px;padding:12px;">
+            {{ complaint.description }}
+          </div>
+        </div>
+
+        <!-- Meta row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;">Category</div>
+            <div style="font-size:13px;color:var(--text);">{{ complaint.get_category_display }}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;">Priority</div>
+            <div>
+              {% if complaint.priority == "HIGH" %}
+                <span class="status-badge sb-rejected">High</span>
+              {% elif complaint.priority == "MEDIUM" %}
+                <span class="status-badge sb-pending">Medium</span>
+              {% else %}
+                <span class="status-badge sb-guest">Low</span>
+              {% endif %}
+            </div>
+          </div>
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;">Raised By</div>
+            <div style="font-size:13px;color:var(--text);">{{ complaint.raisedBy.full_name }}</div>
+          </div>
+          <div>
+            <div style="font-size:11px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:4px;">Raised On</div>
+            <div style="font-size:13px;color:var(--text);">{{ complaint.createdAt|date:"d M Y, h:i A" }}</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Admin note if exists -->
+    {% if complaint.adminNote %}
+      <div class="panel-card">
+        <div class="panel-header"><h3>Admin Note</h3></div>
+        <div style="padding:14px;font-size:13px;color:var(--text);line-height:1.7;
+                    border-left:3px solid rgba(91,124,250,.4);margin:0 16px 16px;
+                    background:rgba(91,124,250,.06);border-radius:0 8px 8px 0;padding:12px 14px;">
+          {{ complaint.adminNote }}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Resolution info -->
+    {% if complaint.status == "RESOLVED" %}
+      <div class="panel-card">
+        <div class="panel-header"><h3>Resolution</h3></div>
+        <div style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--muted);">Resolved by</span>
+            <span style="color:var(--text);font-weight:600;">{{ complaint.resolvedBy.full_name|default:"—" }}</span>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;">
+            <span style="color:var(--muted);">Resolved on</span>
+            <span style="color:var(--text);">{{ complaint.resolvedAt|date:"d M Y, h:i A"|default:"—" }}</span>
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+
+  <!-- Sidebar info -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>Timeline</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <div style="width:8px;height:8px;border-radius:50%;background:#6c63ff;flex-shrink:0;margin-top:4px;"></div>
+          <div>
+            <div style="font-size:12px;font-weight:600;color:var(--text);">Submitted</div>
+            <div style="font-size:11px;color:var(--muted);">{{ complaint.createdAt|date:"d M Y, h:i A" }}</div>
+          </div>
+        </div>
+        {% if complaint.status != "OPEN" %}
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#f0a500;flex-shrink:0;margin-top:4px;"></div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);">Updated</div>
+              <div style="font-size:11px;color:var(--muted);">{{ complaint.updatedAt|date:"d M Y, h:i A" }}</div>
+            </div>
+          </div>
+        {% endif %}
+        {% if complaint.resolvedAt %}
+          <div style="display:flex;gap:10px;align-items:flex-start;">
+            <div style="width:8px;height:8px;border-radius:50%;background:#2dd4a0;flex-shrink:0;margin-top:4px;"></div>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text);">Resolved</div>
+              <div style="font-size:11px;color:var(--muted);">{{ complaint.resolvedAt|date:"d M Y, h:i A" }}</div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+      <div class="panel-card">
+        <div class="panel-header"><h3>Admin Actions</h3></div>
+        <div class="action-row">
+          <div class="action-row-info">
+            <div class="action-title">Update Status</div>
+            <div class="action-desc">Change status or add a note</div>
+          </div>
+          <a href="{% url 'society:update_complaint' complaint.pk %}" class="btn-action">Edit →</a>
+        </div>
+        <div class="action-row">
+          <div class="action-row-info">
+            <div class="action-title">Delete</div>
+            <div class="action-desc">Permanently remove this complaint</div>
+          </div>
+          <a href="{% url 'society:delete_complaint' complaint.pk %}"
+             onclick="return confirm('Delete this complaint? This cannot be undone.')"
+             style="padding:4px 10px;border-radius:5px;border:1px solid rgba(240,95,110,.3);background:rgba(240,95,110,.1);color:#f05f6e;font-size:10px;font-weight:700;text-decoration:none;">
+            Delete
+          </a>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+
+</div>
+
+{% endblock %}

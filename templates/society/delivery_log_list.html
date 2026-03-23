@@ -1,0 +1,64 @@
+{% extends "society/base_society.html" %}
+{% block title %}Delivery Logs | eSociety{% endblock %}
+{% block page_title %}Delivery Logs{% endblock %}
+{% block page_subtitle %}Track delivery received and collected times{% endblock %}
+
+{% block content %}
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Delivery Logs</h3>
+      <a class="btn btn-primary btn-sm" href="{% url 'society:add_delivery_log' %}">+ Add Log</a>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Delivery Person</th>
+          <th>Member</th>
+          <th>Received Time</th>
+          <th>Collected Time</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for log in logs %}
+          <tr>
+            <td style="color:var(--muted);font-size:12px;font-family:monospace;">{{ log.id }}</td>
+            <td style="font-weight:600;color:var(--text);">{{ log.deliveryId.deliveryPerson }}</td>
+            <td style="color:var(--muted);">{{ log.deliveryId.memberId.full_name }}</td>
+            <td style="color:var(--muted);font-size:12px;">
+              {{ log.receivedTime|date:"d M Y, h:i A"|default:"—" }}
+            </td>
+            <td style="font-size:12px;">
+              {% if log.collectedTime %}
+                <span style="color:var(--muted);">{{ log.collectedTime|date:"d M Y, h:i A" }}</span>
+              {% else %}
+                <span class="status-badge sb-pending">Not yet</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if log.collectedTime %}
+                <span class="status-badge sb-approved">Collected</span>
+              {% else %}
+                <span class="status-badge sb-pending">Waiting</span>
+              {% endif %}
+            </td>
+            <td>
+              <a class="btn-action" href="{% url 'society:edit_delivery_log' log.id %}">Edit →</a>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center;padding:28px;color:var(--muted);">
+              No delivery logs yet.
+              <a href="{% url 'society:add_delivery_log' %}" style="color:#a0aff8;">Add the first one →</a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

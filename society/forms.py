@@ -1,5 +1,5 @@
 from django import forms
-from .models import Visitor, Delivery, Child, StaffAttendance, SocietyNotice, VisitorEntryLog, ChildEntryLog
+from .models import Visitor, Delivery, Child, StaffAttendance, SocietyNotice, VisitorEntryLog, ChildEntryLog, DeliveryLog, Complaint
 
 class VisitorForm(forms.ModelForm):
     class Meta:
@@ -140,4 +140,47 @@ class ChildEntryLogForm(forms.ModelForm):
         fields = "__all__"
         widgets = {
             # add widgets if needed
+        }
+
+class DeliveryLogForm(forms.ModelForm):
+    class Meta:
+        model = DeliveryLog
+        fields = ["deliveryId", "receivedTime", "collectedTime"]
+        widgets = {
+            "deliveryId":    forms.Select(attrs={"class": "input"}),
+            "receivedTime":  forms.DateTimeInput(attrs={"class": "input", "type": "datetime-local"}),
+            "collectedTime": forms.DateTimeInput(attrs={"class": "input", "type": "datetime-local"}),
+        }
+
+class ComplaintForm(forms.ModelForm):
+    class Meta:
+        model = Complaint
+        fields = ["title", "description", "category", "priority"]
+        widgets = {
+            "title": forms.TextInput(attrs={
+                "class": "input",
+                "placeholder": "Brief title of the issue"
+            }),
+            "description": forms.Textarea(attrs={
+                "class": "input",
+                "rows": 4,
+                "placeholder": "Describe the issue in detail..."
+            }),
+            "category": forms.Select(attrs={"class": "input"}),
+            "priority": forms.Select(attrs={"class": "input"}),
+        }
+ 
+ 
+class ComplaintUpdateForm(forms.ModelForm):
+    """Used by admin/chairman to update status and add notes."""
+    class Meta:
+        model = Complaint
+        fields = ["status", "adminNote"]
+        widgets = {
+            "status":    forms.Select(attrs={"class": "input"}),
+            "adminNote": forms.Textarea(attrs={
+                "class": "input",
+                "rows": 3,
+                "placeholder": "Add a note for the member (optional)..."
+            }),
         }

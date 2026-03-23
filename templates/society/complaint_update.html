@@ -1,0 +1,113 @@
+{% extends "society/base_society.html" %}
+{% block title %}Update Complaint | eSociety{% endblock %}
+{% block page_title %}Update Complaint{% endblock %}
+{% block page_subtitle %}Change status or add a resolution note{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:complaint_detail' complaint.pk %}">← Back to Complaint</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid cols-21">
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Update: {{ complaint.title }}</h3>
+      {% if complaint.status == "OPEN" %}
+        <span class="status-badge sb-rejected">Open</span>
+      {% elif complaint.status == "IN_PROGRESS" %}
+        <span class="status-badge sb-pending">In Progress</span>
+      {% elif complaint.status == "RESOLVED" %}
+        <span class="status-badge sb-approved">Resolved</span>
+      {% else %}
+        <span class="status-badge sb-guest">Closed</span>
+      {% endif %}
+    </div>
+
+    <!-- Complaint summary -->
+    <div style="padding:12px 16px;border-bottom:1px solid var(--border);
+                background:rgba(255,255,255,0.02);">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">
+        {{ complaint.get_category_display }} ·
+        Raised by {{ complaint.raisedBy.full_name }} ·
+        {{ complaint.createdAt|date:"d M Y" }}
+      </div>
+      <div style="font-size:13px;color:var(--text);">{{ complaint.description|truncatewords:30 }}</div>
+    </div>
+
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+      {% csrf_token %}
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.status.id_for_label }}">
+          New Status <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.status }}
+        {% if form.status.errors %}
+          <div class="field-error">{{ form.status.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.adminNote.id_for_label }}">
+          Note for Member
+        </label>
+        {{ form.adminNote }}
+        {% if form.adminNote.errors %}
+          <div class="field-error">{{ form.adminNote.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Update</button>
+        <a class="btn btn-ghost" href="{% url 'society:complaint_detail' complaint.pk %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Guide -->
+  <div class="panel-card" style="align-self:start;">
+    <div class="panel-header"><h3>Status Guide</h3></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <span class="status-badge sb-rejected" style="flex-shrink:0;">Open</span>
+        <span style="font-size:12px;color:var(--muted);">Just received, not yet actioned.</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <span class="status-badge sb-pending" style="flex-shrink:0;">In Progress</span>
+        <span style="font-size:12px;color:var(--muted);">Assigned and being worked on.</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <span class="status-badge sb-approved" style="flex-shrink:0;">Resolved</span>
+        <span style="font-size:12px;color:var(--muted);">Issue fixed. Marks resolver and time automatically.</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-start;">
+        <span class="status-badge sb-guest" style="flex-shrink:0;">Closed</span>
+        <span style="font-size:12px;color:var(--muted);">No action needed or duplicate complaint.</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "society/base_society.html" %}
+{% block title %}{{ title }} | eSociety{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block page_subtitle %}Fill in delivery received and collected times{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:delivery_log_list' %}">← Back to Logs</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid cols-21">
+
+  <!-- Form -->
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>{{ title }}</h3>
+    </div>
+
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div>
+          <label style="display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.6px;"
+                 for="{{ field.id_for_label }}">
+            {{ field.label }}
+            {% if field.field.required %}
+              <span style="color:#f05f6e;">*</span>
+            {% endif %}
+          </label>
+          {{ field }}
+          {% if field.errors %}
+            <div class="field-error">{{ field.errors|striptags }}</div>
+          {% endif %}
+          {% if field.help_text %}
+            <div style="font-size:11px;color:var(--muted);margin-top:4px;">{{ field.help_text }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Save Log</button>
+        <a class="btn btn-ghost" href="{% url 'society:delivery_log_list' %}">Cancel</a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Info panel -->
+  <div class="panel-card" style="align-self:start;">
+    <div class="panel-header"><h3>Log Guide</h3></div>
+    <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+        <span style="color:var(--text);font-weight:600;">Received Time</span> — Record when the delivery arrives at the gate.
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;font-size:12px;color:var(--muted);line-height:1.6;">
+        <span style="color:var(--text);font-weight:600;">Collected Time</span> — Fill this when the member collects it. Leave blank if still waiting.
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:6px;">
+          <span class="status-badge sb-pending">Waiting</span>
+          <span style="color:var(--muted);">Collected time not yet recorded</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-approved">Collected</span>
+          <span style="color:var(--muted);">Member has picked up</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

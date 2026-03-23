@@ -35,33 +35,51 @@
   <div class="dash-grid cols-2" style="margin-bottom:14px;">
 
     <div class="panel-card">
-      <div class="panel-header">
-        <h3>My Visitors</h3>
-        <a class="link" href="{% url 'society:visitor_list' %}">View all →</a>
-      </div>
-      <table class="table">
-        <thead><tr><th>Name</th><th>Status</th><th>Created</th></tr></thead>
-        <tbody>
-          {% for v in my_visitors %}
-            <tr>
-              <td><b>{{ v.visitorName }}</b></td>
-              <td>
-                {% if v.approvalStatus == "APPROVED" %}
-                  <span class="status-badge sb-approved">Approved</span>
-                {% elif v.approvalStatus == "PENDING" %}
-                  <span class="status-badge sb-pending">Pending</span>
-                {% else %}
-                  <span class="status-badge sb-rejected">{{ v.approvalStatus }}</span>
-                {% endif %}
-              </td>
-              <td>{{ v.createdAt|date:"d M, h:i A" }}</td>
-            </tr>
-          {% empty %}
-            <tr><td colspan="3" class="muted">No visitor records.</td></tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
+  <div class="panel-header">
+    <h3>My Visitors</h3>
+    <a class="link" href="{% url 'society:visitor_list' %}">View all →</a>
+  </div>
+  <table class="table">
+    <thead>
+      <tr><th>Name</th><th>Status</th><th>Created</th><th>Action</th></tr>
+    </thead>
+    <tbody>
+      {% for v in my_visitors %}
+        <tr>
+          <td style="font-weight:600;color:var(--text);">{{ v.visitorName }}</td>
+          <td>
+            {% if v.approvalStatus == "APPROVED" %}
+              <span class="status-badge sb-approved">Approved</span>
+            {% elif v.approvalStatus == "PENDING" %}
+              <span class="status-badge sb-pending">Pending</span>
+            {% else %}
+              <span class="status-badge sb-rejected">Rejected</span>
+            {% endif %}
+          </td>
+          <td style="color:var(--muted);font-size:12px;">{{ v.createdAt|date:"d M, h:i A" }}</td>
+          <td>
+            {% if v.approvalStatus == "PENDING" %}
+              <div style="display:flex;gap:6px;">
+                <a href="{% url 'society:approve_visitor' v.id %}"
+                   style="padding:4px 10px;border-radius:5px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.1);color:#2dd4a0;font-size:10px;font-weight:700;text-decoration:none;">
+                  Approve
+                </a>
+                <a href="{% url 'society:reject_visitor' v.id %}"
+                   style="padding:4px 10px;border-radius:5px;border:1px solid rgba(240,95,110,.3);background:rgba(240,95,110,.1);color:#f05f6e;font-size:10px;font-weight:700;text-decoration:none;">
+                  Reject
+                </a>
+              </div>
+            {% else %}
+              <span style="color:var(--muted);font-size:12px;">—</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="muted" style="padding:16px;">No visitor records.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
     <div class="panel-card">
       <div class="panel-header">

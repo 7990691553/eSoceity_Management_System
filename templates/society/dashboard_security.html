@@ -10,7 +10,6 @@
 
 {% block content %}
 
-  <!-- Stat cards row -->
   <div class="dash-grid cols-3" style="margin-bottom:14px;">
     <div class="stat-card sc-amber">
       <span class="stat-icon">⏳</span>
@@ -32,10 +31,7 @@
     </div>
   </div>
 
-  <!-- Tables + quick actions -->
   <div class="dash-grid cols-2" style="margin-bottom:14px;">
-
-    <!-- Recent visitors table -->
     <div class="panel-card">
       <div class="panel-header">
         <h3>Recent Visitors</h3>
@@ -48,7 +44,7 @@
         <tbody>
           {% for v in recent_visitors %}
             <tr>
-              <td><b>{{ v.visitorName }}</b></td>
+              <td style="font-weight:600;color:var(--text);">{{ v.visitorName }}</td>
               <td>
                 {% if v.approvalStatus == "APPROVED" %}
                   <span class="status-badge sb-approved">Approved</span>
@@ -58,16 +54,15 @@
                   <span class="status-badge sb-rejected">{{ v.approvalStatus }}</span>
                 {% endif %}
               </td>
-              <td>{{ v.memberId.full_name }}</td>
+              <td style="color:var(--muted);">{{ v.memberId.full_name }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3" class="muted">No recent visitors.</td></tr>
+            <tr><td colspan="3" style="color:var(--muted);padding:16px;">No recent visitors.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <!-- Recent deliveries table -->
     <div class="panel-card">
       <div class="panel-header">
         <h3>Recent Deliveries</h3>
@@ -80,27 +75,26 @@
         <tbody>
           {% for d in recent_deliveries %}
             <tr>
-              <td><b>{{ d.deliveryPerson }}</b></td>
+              <td style="font-weight:600;color:var(--text);">{{ d.deliveryPerson }}</td>
               <td>
                 {% if d.deliveryStatus == "COLLECTED" %}
-                  <span class="status-badge sb-collected">Collected</span>
+                  <span class="status-badge sb-approved">Collected</span>
                 {% elif d.deliveryStatus == "PENDING" %}
                   <span class="status-badge sb-pending">Pending</span>
                 {% else %}
                   <span class="status-badge sb-rejected">{{ d.deliveryStatus }}</span>
                 {% endif %}
               </td>
-              <td>{{ d.memberId.full_name }}</td>
+              <td style="color:var(--muted);">{{ d.memberId.full_name }}</td>
             </tr>
           {% empty %}
-            <tr><td colspan="3" class="muted">No recent deliveries.</td></tr>
+            <tr><td colspan="3" style="color:var(--muted);padding:16px;">No recent deliveries.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Log actions + Copilot — compact inline rows -->
   <div class="dash-grid cols-2">
     <div class="panel-card">
       <div class="panel-header"><h3>Gate Logs</h3></div>
@@ -110,6 +104,13 @@
           <div class="action-desc">Add and update visitor entry logs</div>
         </div>
         <a href="{% url 'society:add_visitor_log' %}" class="btn-action">Add Log →</a>
+      </div>
+      <div class="action-row">
+        <div class="action-row-info">
+          <div class="action-title">Delivery Logs</div>
+          <div class="action-desc">Add and update delivery received logs</div>
+        </div>
+        <a href="{% url 'society:add_delivery_log' %}" class="btn-action">Add Log →</a>
       </div>
       <div class="action-row">
         <div class="action-row-info">
@@ -129,7 +130,7 @@
         </div>
         <a href="{% url 'ai:copilot' %}" class="btn-action">Open →</a>
       </div>
-    </div>  
+    </div>
   </div>
 
 {% endblock %}

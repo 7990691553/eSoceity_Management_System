@@ -1,0 +1,141 @@
+{% extends "society/base_society.html" %}
+{% block title %}Raise Complaint | eSociety{% endblock %}
+{% block page_title %}Raise a Complaint{% endblock %}
+{% block page_subtitle %}Report a maintenance issue or concern{% endblock %}
+
+{% block top_actions %}
+  <a class="btn btn-ghost btn-sm" href="{% url 'society:complaint_list' %}">← Back to Complaints</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="dash-grid cols-21">
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>Complaint Details</h3>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error" style="margin:14px 16px 0;">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    <form method="POST" novalidate style="padding:16px;display:flex;flex-direction:column;gap:16px;">
+      {% csrf_token %}
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.title.id_for_label }}">
+          Title <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.title }}
+        {% if form.title.errors %}
+          <div class="field-error">{{ form.title.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="dash-grid cols-2" style="margin-bottom:0;">
+        <div class="form-field">
+          <label class="form-label" for="{{ form.category.id_for_label }}">
+            Category <span style="color:#f05f6e;">*</span>
+          </label>
+          {{ form.category }}
+          {% if form.category.errors %}
+            <div class="field-error">{{ form.category.errors|striptags }}</div>
+          {% endif %}
+        </div>
+        <div class="form-field">
+          <label class="form-label" for="{{ form.priority.id_for_label }}">
+            Priority <span style="color:#f05f6e;">*</span>
+          </label>
+          {{ form.priority }}
+          {% if form.priority.errors %}
+            <div class="field-error">{{ form.priority.errors|striptags }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label class="form-label" for="{{ form.description.id_for_label }}">
+          Description <span style="color:#f05f6e;">*</span>
+        </label>
+        {{ form.description }}
+        {% if form.description.errors %}
+          <div class="field-error">{{ form.description.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div style="display:flex;gap:10px;padding-top:4px;">
+        <button type="submit" class="btn btn-primary">Submit Complaint</button>
+        <a class="btn btn-ghost" href="{% url 'society:complaint_list' %}">Cancel</a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Help panel -->
+  <div style="display:flex;flex-direction:column;gap:12px;">
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>Priority Guide</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span class="status-badge sb-rejected" style="flex-shrink:0;margin-top:2px;">High</span>
+          <span style="font-size:12px;color:var(--muted);">Urgent — affects daily life. Eg: no water, lift stuck, power cut.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span class="status-badge sb-pending" style="flex-shrink:0;margin-top:2px;">Medium</span>
+          <span style="font-size:12px;color:var(--muted);">Important but not emergency. Eg: leaking tap, broken light.</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:flex-start;">
+          <span class="status-badge sb-guest" style="flex-shrink:0;margin-top:2px;">Low</span>
+          <span style="font-size:12px;color:var(--muted);">Minor issue. Eg: paint peeling, garden upkeep.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <div class="panel-header"><h3>Status Flow</h3></div>
+      <div style="padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-rejected">Open</span>
+          <span style="color:var(--muted);">→ Just submitted</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-pending">In Progress</span>
+          <span style="color:var(--muted);">→ Being worked on</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-approved">Resolved</span>
+          <span style="color:var(--muted);">→ Issue fixed</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+          <span class="status-badge sb-guest">Closed</span>
+          <span style="color:var(--muted);">→ No further action</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<style>
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+textarea.input {
+  resize: vertical;
+  min-height: 100px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+  line-height: 1.6;
+}
+</style>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "society/base_society.html" %}
+{% block title %}Complaints | eSociety{% endblock %}
+{% block page_title %}Complaints{% endblock %}
+{% block page_subtitle %}Track and manage society maintenance issues{% endblock %}
+
+{% block content %}
+
+  <div class="dash-grid cols-3" style="margin-bottom:14px;">
+    <div class="stat-card sc-red">
+      <span class="stat-icon">🔴</span>
+      <h3>Open</h3>
+      <p class="big">{{ open_count|default:"0" }}</p>
+      <p class="muted">Needs attention</p>
+    </div>
+    <div class="stat-card sc-amber">
+      <span class="stat-icon">🔧</span>
+      <h3>In Progress</h3>
+      <p class="big">{{ in_progress_count|default:"0" }}</p>
+      <p class="muted">Being worked on</p>
+    </div>
+    <div class="stat-card sc-green">
+      <span class="stat-icon">✓</span>
+      <h3>Resolved</h3>
+      <p class="big">{{ resolved_count|default:"0" }}</p>
+      <p class="muted">Completed</p>
+    </div>
+  </div>
+
+  <div class="panel-card">
+    <div class="panel-header">
+      <h3>All Complaints</h3>
+      {% if request.user.role == "member" or request.user.is_superuser or request.user.role in "chairman super_admin" %}
+        <a class="btn btn-primary btn-sm" href="{% url 'society:add_complaint' %}">+ Raise Complaint</a>
+      {% endif %}
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Category</th>
+          <th>Priority</th>
+          <th>Status</th>
+          <th>Raised By</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in complaints %}
+          <tr>
+            <td style="font-weight:600;color:var(--text);">{{ c.title }}</td>
+            <td style="color:var(--muted);">{{ c.get_category_display }}</td>
+            <td>
+              {% if c.priority == "HIGH" %}
+                <span class="status-badge sb-rejected">High</span>
+              {% elif c.priority == "MEDIUM" %}
+                <span class="status-badge sb-pending">Medium</span>
+              {% else %}
+                <span class="status-badge sb-guest">Low</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if c.status == "OPEN" %}
+                <span class="status-badge sb-rejected">Open</span>
+              {% elif c.status == "IN_PROGRESS" %}
+                <span class="status-badge sb-pending">In Progress</span>
+              {% elif c.status == "RESOLVED" %}
+                <span class="status-badge sb-approved">Resolved</span>
+              {% else %}
+                <span class="status-badge sb-guest">Closed</span>
+              {% endif %}
+            </td>
+            <td style="color:var(--muted);">{{ c.raisedBy.full_name }}</td>
+            <td style="color:var(--muted);font-size:12px;">{{ c.createdAt|date:"d M Y" }}</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a class="btn-action" href="{% url 'society:complaint_detail' c.pk %}">View →</a>
+                {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
+                  <a class="btn-action" href="{% url 'society:update_complaint' c.pk %}">Update</a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" style="text-align:center;padding:28px;color:var(--muted);">
+              No complaints raised yet.
+              {% if request.user.role == "member" %}
+                <a href="{% url 'society:add_complaint' %}" style="color:#a0aff8;">Raise one →</a>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+{% endblock %}

@@ -3,11 +3,6 @@
 {% block page_title %}Society Notices{% endblock %}
 {% block page_subtitle %}Announcements and updates for all residents{% endblock %}
 
-{% block top_actions %}
-  {% if request.user.is_superuser or request.user.role in "chairman super_admin" %}
-    <a class="btn btn-primary btn-sm" href="{% url 'society:add_notice' %}">+ Post Notice</a>
-  {% endif %}
-{% endblock %}
 
 {% block content %}
 

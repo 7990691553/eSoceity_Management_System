@@ -8,10 +8,10 @@ from ai.services.copilot import generate_copilot_context
 
 from .decorators import role_required
 from .models import (
-    Visitor, Delivery, Child, StaffAttendance, SocietyNotice, SocietySettings, VisitorEntryLog, ChildEntryLog
+    Visitor, Delivery, Child, StaffAttendance, SocietyNotice, SocietySettings, VisitorEntryLog, ChildEntryLog, DeliveryLog, Complaint
 )
 from .forms import (
-    ChildAdminForm, VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm, VisitorEntryLogForm , ChildEntryLogForm
+    ChildAdminForm, VisitorForm, DeliveryForm, ChildForm, StaffAttendanceForm, NoticeForm, VisitorEntryLogForm , ChildEntryLogForm, DeliveryLogForm, ComplaintForm, ComplaintUpdateForm
 )
 
 
@@ -132,13 +132,36 @@ def visitor_list(request):
     })
 
 @login_required
-@role_required("chairman","super_admin")
+@role_required("chairman", "super_admin", "member")
 def approve_visitor(request, id):
-    visitor = Visitor.objects.get(id=id)
+    visitor = get_object_or_404(Visitor, id=id)
+
+    # Security check — member can only approve their OWN visitors
+    if request.user.role == "member" and visitor.memberId != request.user:
+        messages.error(request, "You can only approve your own visitors.")
+        return redirect("society:visitor_list")
+
     visitor.approvalStatus = "APPROVED"
     visitor.approvedBy = request.user
     visitor.approvedAt = now()
     visitor.save()
+    messages.success(request, f"{visitor.visitorName} has been approved.")
+    return redirect("society:visitor_list")
+
+@login_required
+@role_required("chairman", "super_admin", "member")
+def reject_visitor(request, id):
+    visitor = get_object_or_404(Visitor, id=id)
+
+    if request.user.role == "member" and visitor.memberId != request.user:
+        messages.error(request, "You can only reject your own visitors.")
+        return redirect("society:visitor_list")
+
+    visitor.approvalStatus = "REJECTED"
+    visitor.approvedBy = request.user
+    visitor.approvedAt = now()
+    visitor.save()
+    messages.success(request, f"{visitor.visitorName} has been rejected.")
     return redirect("society:visitor_list")
 
 @login_required
@@ -507,3 +530,122 @@ def edit_child_log(request, pk):
         "log": log,
     }
     return render(request, "society/child_log_form.html", context)
+
+
+@login_required
+@role_required("security", "super_admin", "chairman")
+def delivery_log_list(request):
+    logs = DeliveryLog.objects.order_by("-id")
+    return render(request, "society/delivery_log_list.html", {"logs": logs})
+ 
+ 
+@login_required
+@role_required("security", "super_admin", "chairman")
+def add_delivery_log(request):
+    form = DeliveryLogForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("society:delivery_log_list")
+    return render(request, "society/delivery_log_form.html", {
+        "form": form,
+        "title": "Add Delivery Log",
+    })
+ 
+ 
+@login_required
+@role_required("security", "super_admin", "chairman")
+def edit_delivery_log(request, pk):
+    log = get_object_or_404(DeliveryLog, pk=pk)
+    form = DeliveryLogForm(request.POST or None, instance=log)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        return redirect("society:delivery_log_list")
+    return render(request, "society/delivery_log_form.html", {
+        "form": form,
+        "title": "Update Delivery Log",
+        "log": log,
+    })
+
+@login_required
+def complaint_list(request):
+    user = request.user
+    role = getattr(user, "role", None)
+ 
+    if user.is_superuser or role in ("chairman", "super_admin"):
+        complaints = Complaint.objects.all().order_by("-createdAt")
+    elif role == "security":
+        complaints = Complaint.objects.all().order_by("-createdAt")
+    else:
+        complaints = Complaint.objects.filter(raisedBy=user).order_by("-createdAt")
+ 
+    open_count        = complaints.filter(status="OPEN").count()
+    in_progress_count = complaints.filter(status="IN_PROGRESS").count()
+    resolved_count    = complaints.filter(status="RESOLVED").count()
+ 
+    return render(request, "society/complaint_list.html", {
+        "complaints":       complaints,
+        "open_count":       open_count,
+        "in_progress_count": in_progress_count,
+        "resolved_count":   resolved_count,
+    })
+ 
+ 
+@login_required
+@role_required("member", "chairman", "super_admin")
+def add_complaint(request):
+    form = ComplaintForm(request.POST or None)
+    if request.method == "POST" and form.is_valid():
+        obj = form.save(commit=False)
+        obj.raisedBy = request.user
+        obj.save()
+        messages.success(request, "Complaint submitted successfully.")
+        return redirect("society:complaint_list")
+    return render(request, "society/complaint_form.html", {"form": form})
+ 
+ 
+@login_required
+def complaint_detail(request, pk):
+    user = request.user
+    role = getattr(user, "role", None)
+    complaint = get_object_or_404(Complaint, pk=pk)
+ 
+    # Members can only view their own complaints
+    if role == "member" and complaint.raisedBy != user:
+        messages.error(request, "You can only view your own complaints.")
+        return redirect("society:complaint_list")
+ 
+    return render(request, "society/complaint_detail.html", {
+        "complaint": complaint,
+    })
+ 
+ 
+@login_required
+@role_required("chairman", "super_admin")
+def update_complaint(request, pk):
+    complaint = get_object_or_404(Complaint, pk=pk)
+    form = ComplaintUpdateForm(request.POST or None, instance=complaint)
+ 
+    if request.method == "POST" and form.is_valid():
+        obj = form.save(commit=False)
+        # Auto-set resolvedBy and resolvedAt when marking resolved
+        if obj.status == "RESOLVED" and not complaint.resolvedAt:
+            from django.utils.timezone import now as tz_now
+            obj.resolvedBy = request.user
+            obj.resolvedAt = tz_now()
+        obj.save()
+        messages.success(request, "Complaint updated successfully.")
+        return redirect("society:complaint_detail", pk=pk)
+ 
+    return render(request, "society/complaint_update.html", {
+        "form":      form,
+        "complaint": complaint,
+    })
+ 
+ 
+@login_required
+@role_required("chairman", "super_admin")
+def delete_complaint(request, pk):
+    complaint = get_object_or_404(Complaint, pk=pk)
+    complaint.delete()
+    messages.success(request, "Complaint deleted.")
+    return redirect("society:complaint_list")

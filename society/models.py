@@ -293,3 +293,61 @@ class SocietySettings(models.Model):
 
     def __str__(self):
         return "Society Settings"
+
+# COMPLAINT SYSTEM — COMPLETE IMPLEMENTATION
+
+class Complaint(models.Model):
+ 
+    CATEGORY_CHOICES = (
+        ("WATER",       "Water Supply"),
+        ("ELECTRICITY", "Electricity"),
+        ("LIFT",        "Lift / Elevator"),
+        ("PARKING",     "Parking"),
+        ("CLEANLINESS", "Cleanliness"),
+        ("NOISE",       "Noise"),
+        ("SECURITY",    "Security"),
+        ("OTHER",       "Other"),
+    )
+ 
+    STATUS_CHOICES = (
+        ("OPEN",        "Open"),
+        ("IN_PROGRESS", "In Progress"),
+        ("RESOLVED",    "Resolved"),
+        ("CLOSED",      "Closed"),
+    )
+ 
+    PRIORITY_CHOICES = (
+        ("LOW",    "Low"),
+        ("MEDIUM", "Medium"),
+        ("HIGH",   "High"),
+    )
+ 
+    title       = models.CharField(max_length=100)
+    description = models.TextField()
+    category    = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default="OTHER")
+    priority    = models.CharField(max_length=10, choices=PRIORITY_CHOICES, default="MEDIUM")
+    status      = models.CharField(max_length=15, choices=STATUS_CHOICES, default="OPEN")
+ 
+    raisedBy    = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="complaints_raised"
+    )
+    resolvedBy  = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name="complaints_resolved"
+    )
+ 
+    adminNote   = models.TextField(blank=True, null=True)
+    resolvedAt  = models.DateTimeField(null=True, blank=True)
+    createdAt   = models.DateTimeField(auto_now_add=True)
+    updatedAt   = models.DateTimeField(auto_now=True)
+ 
+    class Meta:
+        db_table = "complaint"
+        ordering = ["-createdAt"]
+ 
+    def __str__(self):
+        return f"{self.title} — {self.raisedBy.full_name}"

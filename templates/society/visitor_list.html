@@ -38,56 +38,84 @@
     </div>
     <table class="table">
       <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Purpose</th>
-          <th>Status</th>
-          <th>Member</th>
-          <th>Prior Permission</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for v in visitors %}
-          <tr>
-            <td style="font-weight:600;color:var(--text);">{{ v.visitorName }}</td>
-            <td>
-              {% if v.visitorType == "GUEST" %}
-                <span class="status-badge sb-guest">Guest</span>
+      <tr>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Purpose</th>
+      <th>Status</th>
+      <th>Member</th>
+      <th>Prior Permission</th>
+      <th>Created</th>
+      {% if request.user.is_superuser or request.user.role in "chairman super_admin member" %}
+        <th>Action</th>
+      {% endif %}
+    </tr>
+  </thead>
+  <tbody>
+    {% for v in visitors %}
+      <tr>
+        <td style="font-weight:600;color:var(--text);">{{ v.visitorName }}</td>
+        <td>
+          {% if v.visitorType == "GUEST" %}
+            <span class="status-badge sb-guest">Guest</span>
+          {% else %}
+            <span class="status-badge sb-service">Service</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--muted);">{{ v.visitPurpose|default:"—" }}</td>
+        <td>
+          {% if v.approvalStatus == "APPROVED" %}
+            <span class="status-badge sb-approved">Approved</span>
+          {% elif v.approvalStatus == "PENDING" %}
+            <span class="status-badge sb-pending">Pending</span>
+          {% else %}
+            <span class="status-badge sb-rejected">Rejected</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--muted);">{{ v.memberId.full_name }}</td>
+        <td>
+          {% if v.priorPermission %}
+            <span class="status-badge sb-approved">Yes</span>
+          {% else %}
+            <span class="status-badge sb-pending">No</span>
+          {% endif %}
+        </td>
+        <td style="color:var(--muted);font-size:12px;">{{ v.createdAt|date:"d M Y, h:i A" }}</td>
+
+        {% if request.user.is_superuser or request.user.role in "chairman super_admin member" %}
+          <td>
+            {% if v.approvalStatus == "PENDING" %}
+              {% if request.user.is_superuser or request.user.role in "chairman super_admin" or v.memberId == request.user %}
+                <div style="display:flex;gap:6px;">
+                  <a href="{% url 'society:approve_visitor' v.id %}"
+                     style="padding:4px 10px;border-radius:5px;border:1px solid rgba(45,212,160,.3);background:rgba(45,212,160,.1);color:#2dd4a0;font-size:10px;font-weight:700;text-decoration:none;">
+                    Approve
+                  </a>
+                  <a href="{% url 'society:reject_visitor' v.id %}"
+                     style="padding:4px 10px;border-radius:5px;border:1px solid rgba(240,95,110,.3);background:rgba(240,95,110,.1);color:#f05f6e;font-size:10px;font-weight:700;text-decoration:none;">
+                    Reject
+                  </a>
+                </div>
               {% else %}
-                <span class="status-badge sb-service">Service</span>
+                <span style="color:var(--muted);font-size:12px;">—</span>
               {% endif %}
-            </td>
-            <td style="color:var(--muted);">{{ v.visitPurpose|default:"—" }}</td>
-            <td>
-              {% if v.approvalStatus == "APPROVED" %}
-                <span class="status-badge sb-approved">Approved</span>
-              {% elif v.approvalStatus == "PENDING" %}
-                <span class="status-badge sb-pending">Pending</span>
-              {% else %}
-                <span class="status-badge sb-rejected">Rejected</span>
-              {% endif %}
-            </td>
-            <td style="color:var(--muted);">{{ v.memberId.full_name }}</td>
-            <td>
-              {% if v.priorPermission %}
-                <span class="status-badge sb-approved">Yes</span>
-              {% else %}
-                <span class="status-badge sb-pending">No</span>
-              {% endif %}
-            </td>
-            <td style="color:var(--muted);font-size:12px;">{{ v.createdAt|date:"d M Y, h:i A" }}</td>
-          </tr>
-        {% empty %}
-          <tr>
-            <td colspan="7" style="text-align:center;padding:28px;color:var(--muted);">
-              No visitor records found.
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            {% else %}
+              <span style="color:var(--muted);font-size:12px;">
+                {% if v.approvedBy %}by {{ v.approvedBy.full_name }}{% else %}—{% endif %}
+              </span>
+            {% endif %}
+          </td>
+        {% endif %}
+      </tr>
+    {% empty %}
+      <tr>
+        <td colspan="8" style="text-align:center;padding:28px;color:var(--muted);">
+          No visitor records found.
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+  </table>
   </div>
 
 {% endblock %}
