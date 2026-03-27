@@ -252,34 +252,6 @@ Key components:
 
 ---
 
-## 📝 How to Add Screenshots
-
-1. Run the project locally
-2. Take screenshots of:
-   - Admin dashboard
-   - Security dashboard
-   - Member dashboard
-   - Visitor list page
-   - Complaint system
-   - AI dashboard
-3. Save them in a folder called `screenshots/` in the project root
-4. Replace the Screenshots section above with:
-
-```markdown
-## 📸 Screenshots
-
-### Admin Dashboard
-![Admin Dashboard](screenshots/admin_dashboard.png)
-
-### Security Dashboard
-![Security Dashboard](screenshots/security_dashboard.png)
-
-### AI Dashboard
-![AI Dashboard](screenshots/ai_dashboard.png)
-```
-
----
-
 ## 🗺️ Roadmap
 
 - [ ] Email notifications (visitor arrived, delivery ready)
