@@ -12,8 +12,23 @@ A full-stack web application built with Django for managing residential society 
 
 ## 📸 Screenshots
 
-> Add screenshots here after reading the instructions at the bottom of this file.
+### Admin Dashboard
+![Admin Dashboard](screenshots/admin_dashboard.png)
 
+### Security Dashboard
+![Security Dashboard](screenshots/security_dashboard.png)
+
+### Member Dashboard
+![Member Dashboard](screenshots/member_dashboard.png)
+
+### Visitor List
+![Visitor List](screenshots/visitor_list.png)
+
+### Complaint System
+![Complaints](screenshots/complaints.png)
+
+### AI Dashboard
+![AI Dashboard](screenshots/ai_dashboard.png)
 ---
 
 ## 🚀 Features
