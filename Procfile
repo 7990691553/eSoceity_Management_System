@@ -1,0 +1,1 @@
+web: gunicorn eSociety.wsgi --log-file -

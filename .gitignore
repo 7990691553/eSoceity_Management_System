@@ -17,3 +17,9 @@ db.sqlite3
 
 # Editor
 .vscode/
+
+# Generated static files
+staticfiles/
+
+# User uploaded media
+media/
