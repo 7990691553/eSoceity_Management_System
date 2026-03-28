@@ -4,12 +4,6 @@ A full-stack web application built with Django for managing residential society 
 
 ---
 
-## 🔗 Live Demo
-
-> Coming soon — deployment in progress
-
----
-
 ## 📸 Screenshots
 
 ### Admin Dashboard
